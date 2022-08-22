@@ -19,3 +19,7 @@ thiserror = "1"
 tobj = "2"
 vulkanalia = { version = "=0.12.0", features = ["libloading", "window"] }
 winit = "0.24"
+imgui-rs-vulkan-renderer = "1.4.0"
+
+[patch.crates-io]
+vk-mem = { git = "https://github.com/adrien-ben/vk-mem-rs", tag = "0.2.3-ash-0.34-0.37" }

@@ -10,7 +10,8 @@ use vulkanalia::vk::DeviceV1_0;
 use winit::dpi::LogicalSize;
 use winit::event::{Event, WindowEvent};
 use winit::event_loop::{ControlFlow, EventLoop};
-mod Application;
+
+use gloria::*;
 
 fn main() -> Result<()> {
     pretty_env_logger::init();
