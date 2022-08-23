@@ -36,12 +36,13 @@ namespace gloria::core {
 			createDeviceInfo.pEnabledFeatures = &deviceFeatures;
 			createDeviceInfo.enabledExtensionCount = 0;
 
-#ifdef DEBUG
-			createDeviceInfo.enabledLayerCount = static_cast<std::uint32_t>(validationLayers.m_validationLayers.size());
-			createDeviceInfo.ppEnabledLayerNames = validationLayers.m_validationLayers.data();
-#else
-			createDeviceInfo.enabledLayerCount = 0;
-#endif // DEBUG
+			if (validationLayers.isEnabled()) {
+				createDeviceInfo.enabledLayerCount = static_cast<std::uint32_t>(validationLayers.m_validationLayers.size());
+				createDeviceInfo.ppEnabledLayerNames = validationLayers.m_validationLayers.data();
+			}
+			else {
+				createDeviceInfo.enabledLayerCount = 0;
+			}
 
 			VK_VALIDATE(vkCreateDevice(physicalDevice.getPhysicalDevice(), &createDeviceInfo, nullptr, &m_device) != VK_SUCCESS, "Failed to create a LogicalDevice");
 
@@ -56,5 +57,4 @@ namespace gloria::core {
 		VkDevice m_device;
 		VkQueue m_graphicsQueue;
 	};
-
 }
