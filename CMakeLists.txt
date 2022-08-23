@@ -8,6 +8,7 @@ add_compile_definitions(DEBUG)
 add_executable(gloria 
     "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/core/application/application.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core/logger/logger.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/core/window/window.hpp"
 )
 
@@ -50,6 +51,11 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/glfw")
 target_link_libraries(gloria PUBLIC glfw)
 
 target_link_libraries(gloria PUBLIC ${Vulkan_LIBRARIES})
+
+# Add spldog subdirectory and link it
+message(STATUS "Compiling & Linking SPDLOG")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/spdlog")
+target_link_libraries(gloria PUBLIC spdlog)
 
 target_include_directories(gloria SYSTEM PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}/external")

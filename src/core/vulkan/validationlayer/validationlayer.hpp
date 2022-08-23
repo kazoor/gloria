@@ -2,6 +2,7 @@
 #include <vulkan/vulkan.h>
 #include <iostream>
 #include <vector>
+#include "../../defines.hpp"
 
 class ValidationLayer {
 public:
@@ -54,6 +55,16 @@ public:
 		createInfo.pUserData = nullptr; // Optional
 	}
 
+	void setupDebugMessenger(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger) {
+		if (!m_enabled)
+			return;
+
+		VkDebugUtilsMessengerCreateInfoEXT createInfo;
+		populateDebugMessengerCreateInfo(createInfo);
+
+		VK_VALIDATE(CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger), "Failed to create debug VkDebugUtilsMessengerEXT");
+	}
+
 	VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
 		auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
 		if (func != nullptr) {
@@ -77,7 +88,30 @@ public:
 		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
 		void* pUserData) {
 
-		std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
+		switch (messageSeverity) {
+#ifdef DEBUG
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT: {
+			GL_CORE_TRACE("{0}", pCallbackData->pMessage);
+			break;
+		}
+#endif // DEBUG
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT: {
+			GL_CORE_INFO("{0}", pCallbackData->pMessage);
+			break;
+		}
+
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT: {
+			GL_CORE_WARN("{0}", pCallbackData->pMessage);
+			break;
+		}
+
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT: {
+			GL_CORE_ERROR("{0}", pCallbackData->pMessage);
+			break;
+		}
+
+		default: break;
+		}
 
 		return VK_FALSE;
 	}
@@ -86,7 +120,7 @@ public:
 	bool isEnabled() const {
 		return m_enabled;
 	}
-	
+
 	const std::vector<const char*> m_validationLayers = {
 		"VK_LAYER_KHRONOS_validation"
 	};
