@@ -1,60 +1,85 @@
 #pragma once
 #include <vulkan/vulkan.h>
+#include <set>
 #include "../../defines.hpp"
 #include "../queuefamilyindices/queuefamilyindices.hpp"
 #include "../validationlayer/validationlayer.hpp"
 #include "../physicaldevice/physicaldevice.hpp"
+#include "../surface/windowsurface.hpp"
 
 namespace gloria::core {
 	class LogicalDevice {
 	public:
 		LogicalDevice() {}
 
-		LogicalDevice(PhysicalDevice physicalDevice, ValidationLayer validationLayers) {
-			createLogicalDevice(physicalDevice, validationLayers);
+		LogicalDevice(PhysicalDevice& physicalDevice, ValidationLayer* validationLayers, WindowSurface surface) {
+			createLogicalDevice(physicalDevice, validationLayers, surface);
 		}
 
 		~LogicalDevice() {}
 
-		void createLogicalDevice(PhysicalDevice physicalDevice, ValidationLayer validationLayers) {
-			QueueFamilyIndices indices(physicalDevice.getPhysicalDevice());
+		void createLogicalDevice(PhysicalDevice& physicalDevice, ValidationLayer* validationLayers, WindowSurface surface) {
+			QueueFamilyIndices indices(physicalDevice.getPhysicalDevice(), surface);
 
-			float queuePrio = 1.0f;
-			VkDeviceQueueCreateInfo createQueueInfo = {
-				.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-				.queueFamilyIndex = indices.getGraphicsFamily().value(),
-				.queueCount = 1,
-				.pQueuePriorities = &queuePrio
-			};
+			/*VkDeviceQueueCreateInfo queueCreateInfo{};
+			queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+			queueCreateInfo.queueFamilyIndex = indices.getGraphicsFamily().value();
+			queueCreateInfo.queueCount = 1;*/
+
+			std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+			std::set<std::uint32_t> uniqueQueueFamilies = { indices.getGraphicsFamily().value(), indices.getPresentFamily().value() };
+			float queuePriority = 1.0f;
+
+			for (std::uint32_t queueFamily : uniqueQueueFamilies) {
+				VkDeviceQueueCreateInfo queueCreateInfo = {
+					.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+					.queueFamilyIndex = queueFamily,
+					.queueCount = 1,
+					.pQueuePriorities = &queuePriority
+				};
+
+				queueCreateInfos.push_back(queueCreateInfo);
+			}
 
 			VkPhysicalDeviceFeatures deviceFeatures{};
 
-			VkDeviceCreateInfo createDeviceInfo{};
-			createDeviceInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-			createDeviceInfo.pQueueCreateInfos = &createQueueInfo;
-			createDeviceInfo.queueCreateInfoCount = 1;
-			createDeviceInfo.pEnabledFeatures = &deviceFeatures;
-			createDeviceInfo.enabledExtensionCount = 0;
+			VkDeviceCreateInfo createInfo{};
+			createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 
-			if (validationLayers.isEnabled()) {
-				createDeviceInfo.enabledLayerCount = static_cast<std::uint32_t>(validationLayers.m_validationLayers.size());
-				createDeviceInfo.ppEnabledLayerNames = validationLayers.m_validationLayers.data();
+			createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());;
+			createInfo.pQueueCreateInfos = queueCreateInfos.data();
+
+			createInfo.pEnabledFeatures = &deviceFeatures;
+
+			createInfo.enabledExtensionCount = 0;
+
+			if (validationLayers->isEnabled()) {
+				createInfo.enabledLayerCount = static_cast<std::uint32_t>(validationLayers->m_validationLayers.size());
+				createInfo.ppEnabledLayerNames = validationLayers->m_validationLayers.data();
 			}
 			else {
-				createDeviceInfo.enabledLayerCount = 0;
+				createInfo.enabledLayerCount = 0;
 			}
 
-			VK_VALIDATE(vkCreateDevice(physicalDevice.getPhysicalDevice(), &createDeviceInfo, nullptr, &m_device) != VK_SUCCESS, "Failed to create a LogicalDevice");
+			if (vkCreateDevice(physicalDevice.getPhysicalDevice(), &createInfo, nullptr, &m_device) != VK_SUCCESS) {
+				throw std::runtime_error("failed to create logical device!");
+			}
 
 			vkGetDeviceQueue(m_device, indices.getGraphicsFamily().value(), 0, &m_graphicsQueue);
+			vkGetDeviceQueue(m_device, indices.getPresentFamily().value(), 0, &m_presentQueue);
 		}
 
-		VkDevice getDevice()& {
+		void destroy() {
+			vkDestroyDevice(m_device, nullptr);
+		}
+
+		VkDevice getDevice() {
 			return m_device;
 		}
 
 	private:
 		VkDevice m_device;
 		VkQueue m_graphicsQueue;
+		VkQueue m_presentQueue;
 	};
 }
