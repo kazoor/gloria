@@ -44,6 +44,10 @@ namespace gloria::core {
 			}
 		}
 
+		VkPhysicalDevice getPhysicalDevice()& {
+			return m_PhysicalDevice;
+		}
+
 	private:
 		// rates a gpu by
 		int rateDevice(VkPhysicalDevice device) {

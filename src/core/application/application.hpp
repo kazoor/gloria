@@ -9,6 +9,8 @@
 #include "../window/window.hpp"
 #include "../vulkan/validationlayer/validationlayer.hpp"
 #include "../logger/logger.hpp"
+#include "../vulkan/physicaldevice/physicaldevice.hpp"
+#include "../vulkan/logicaldevice/logicaldevice.hpp"
 
 namespace gloria::core {
 	class Application {
@@ -35,7 +37,8 @@ namespace gloria::core {
 		void initVulkan() {
 			createVulkanInstance();
 			m_layers->setupDebugMessenger(m_vkInstance, m_debugMessenger);
-
+			m_PhysicalDevice = PhysicalDevice(m_vkInstance);
+			m_LogicalDevice = LogicalDevice(m_PhysicalDevice, *m_layers);
 		}
 
 		void mainLoop() {
@@ -45,6 +48,8 @@ namespace gloria::core {
 		}
 
 		void cleanup() {
+			vkDestroyDevice(m_LogicalDevice.getDevice(), nullptr);
+
 			if (m_layers->isEnabled()) {
 				m_layers->DestroyDebugUtilsMessengerEXT(m_vkInstance, m_debugMessenger, nullptr);
 			}
@@ -104,6 +109,8 @@ namespace gloria::core {
 		VkInstance m_vkInstance;
 		VkDebugUtilsMessengerEXT m_debugMessenger;
 		ValidationLayer* m_layers;
+		PhysicalDevice m_PhysicalDevice;
+		LogicalDevice m_LogicalDevice;
 	};
 
 }
