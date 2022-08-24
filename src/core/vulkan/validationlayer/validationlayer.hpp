@@ -15,7 +15,7 @@ public:
 		std::vector<VkLayerProperties> layers(layerCount);
 		vkEnumerateInstanceLayerProperties(&layerCount, layers.data());
 
-		for (const auto& layer : m_validationLayers) {
+		for (const auto& layer : g_validationLayers) {
 			bool found = false;
 
 			for (const auto& properties : layers) {
@@ -49,10 +49,6 @@ public:
 	bool isEnabled() {
 		return m_enabled;
 	}
-
-	const std::vector<const char*> m_validationLayers = {
-		"VK_LAYER_KHRONOS_validation"
-	};
 
 private:
 #ifdef DEBUG

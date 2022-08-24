@@ -2,9 +2,11 @@
 #include <iostream>
 #include <vulkan/vulkan.h>
 #include <map>
+#include <set>
 #include "../../defines.hpp"
 #include "../queuefamilyindices/queuefamilyindices.hpp"
 #include "../surface/windowsurface.hpp"
+#include "../swapchain/swapchainsupport.hpp"
 
 namespace gloria::core {
 	class PhysicalDevice {
@@ -47,7 +49,7 @@ namespace gloria::core {
 #ifdef DEBUG
 			VkPhysicalDeviceProperties deviceProperties;
 			vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
-			GL_CORE_INFO("DEVICES: {0}, DEVICE_NAME: {1}", devices.size(), deviceProperties.deviceName);
+			GL_CORE_INFO("DEVICES: {0}, DEVICE_NAME: {1}, VENDOR_ID: {2}, DRIVER_VERSION: {3}", devices.size(), deviceProperties.deviceName, deviceProperties.vendorID, deviceProperties.driverVersion);
 #endif // DEBUG
 		}
 
@@ -68,11 +70,23 @@ namespace gloria::core {
 			int score = 0;
 
 			if (indices.isComplete())
-				score += indices.getGraphicsFamily().value();
+				score += 100;
+
+			bool swapchainAdequate = false;
+			if (checkDeviceExtensionSupport(device)) {
+				SwapchainSupport swapchainSupport(device, surface.getSurface());
+				swapchainAdequate = !swapchainSupport.getSwapchainSupportDetails().m_formats.empty() && !swapchainSupport.getSwapchainSupportDetails().m_presentModes.empty();
+			}
+
+			if (swapchainAdequate)
+				score += 100;
 
 			// ALWAYS prioritize discrete GPUs over integrated graphics
 			if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
 				score += 1000;
+
+			if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU)
+				score += 100;
 
 			// maximum amount of textures possible
 			score += deviceProperties.limits.maxImageDimension2D;
@@ -84,6 +98,23 @@ namespace gloria::core {
 
 			return score;
 		}
+
+		bool checkDeviceExtensionSupport(VkPhysicalDevice device) {
+			std::uint32_t extensionCount;
+			vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+
+			std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+			vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
+
+			std::set<std::string> requiredExtensions(g_deviceExtensions.begin(), g_deviceExtensions.end());
+
+			for (const auto& extension : availableExtensions) {
+				requiredExtensions.erase(extension.extensionName);
+			}
+
+			return requiredExtensions.empty();
+		}
+
 	private:
 		VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
 	};

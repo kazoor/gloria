@@ -15,6 +15,7 @@
 #include "../vulkan/physicaldevice/physicaldevice.hpp"
 #include "../vulkan/logicaldevice/logicaldevice.hpp"
 #include "../vulkan/surface/windowsurface.hpp"
+#include "../vulkan/swapchain/swapchain.hpp"
 
 inline VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
 	auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
@@ -40,12 +41,10 @@ inline VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 	void* pUserData) {
 
 	switch (messageSeverity) {
-#ifdef DEBUG
 	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT: {
 		GL_CORE_TRACE("{0}", pCallbackData->pMessage);
 		break;
 	}
-#endif // DEBUG
 	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT: {
 		GL_CORE_INFO("{0}", pCallbackData->pMessage);
 		break;
@@ -96,6 +95,7 @@ namespace gloria::core {
 			m_surface = WindowSurface(m_vkInstance, *m_window);
 			m_PhysicalDevice = PhysicalDevice(m_vkInstance, m_surface);
 			m_LogicalDevice = LogicalDevice(m_PhysicalDevice, m_layers, m_surface);
+			m_swapChain = Swapchain(m_PhysicalDevice.getPhysicalDevice(), m_LogicalDevice.getDevice(), m_surface);
 		}
 
 		void mainLoop() {
@@ -107,6 +107,8 @@ namespace gloria::core {
 		}
 
 		void cleanup() {
+			m_swapChain.destroy(m_LogicalDevice.getDevice());
+
 			vkDestroyDevice(m_LogicalDevice.getDevice(), nullptr);
 
 			if (m_layers->isEnabled())
@@ -148,8 +150,8 @@ namespace gloria::core {
 
 			VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
 			if (m_layers->isEnabled()) {
-				createInfo.enabledLayerCount = static_cast<uint32_t>(m_layers->m_validationLayers.size());
-				createInfo.ppEnabledLayerNames = m_layers->m_validationLayers.data();
+				createInfo.enabledLayerCount = static_cast<uint32_t>(g_validationLayers.size());
+				createInfo.ppEnabledLayerNames = g_validationLayers.data();
 
 				populateDebugMessengerCreateInfo(debugCreateInfo);
 				createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
@@ -187,6 +189,6 @@ namespace gloria::core {
 		WindowSurface m_surface;
 		PhysicalDevice m_PhysicalDevice;
 		LogicalDevice m_LogicalDevice;
+		Swapchain m_swapChain;
 	};
-
 }

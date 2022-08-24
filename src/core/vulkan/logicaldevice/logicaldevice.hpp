@@ -21,11 +21,6 @@ namespace gloria::core {
 		void createLogicalDevice(PhysicalDevice& physicalDevice, ValidationLayer* validationLayers, WindowSurface surface) {
 			QueueFamilyIndices indices(physicalDevice.getPhysicalDevice(), surface);
 
-			/*VkDeviceQueueCreateInfo queueCreateInfo{};
-			queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-			queueCreateInfo.queueFamilyIndex = indices.getGraphicsFamily().value();
-			queueCreateInfo.queueCount = 1;*/
-
 			std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 			std::set<std::uint32_t> uniqueQueueFamilies = { indices.getGraphicsFamily().value(), indices.getPresentFamily().value() };
 			float queuePriority = 1.0f;
@@ -51,11 +46,12 @@ namespace gloria::core {
 
 			createInfo.pEnabledFeatures = &deviceFeatures;
 
-			createInfo.enabledExtensionCount = 0;
+			createInfo.enabledExtensionCount = static_cast<uint32_t>(g_deviceExtensions.size());
+			createInfo.ppEnabledExtensionNames = g_deviceExtensions.data();
 
 			if (validationLayers->isEnabled()) {
-				createInfo.enabledLayerCount = static_cast<std::uint32_t>(validationLayers->m_validationLayers.size());
-				createInfo.ppEnabledLayerNames = validationLayers->m_validationLayers.data();
+				createInfo.enabledLayerCount = static_cast<std::uint32_t>(g_validationLayers.size());
+				createInfo.ppEnabledLayerNames = g_validationLayers.data();
 			}
 			else {
 				createInfo.enabledLayerCount = 0;

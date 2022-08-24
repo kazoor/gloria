@@ -1,2 +1,2 @@
 # gloria
-Rust vulkan engine
+C++ vulkan engine
