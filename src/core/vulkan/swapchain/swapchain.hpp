@@ -27,7 +27,7 @@ namespace gloria::core {
 			m_presentMode = swapchainSupport.selectSwapPresentMode(swapchainDetails.m_presentModes);
 			m_extent = swapchainSupport.selectSwapExtent(swapchainDetails.m_capabilities);
 
-			std::uint32_t imageCount = swapchainDetails.m_capabilities.minImageCount + 1;
+			std::uint32_t imageCount = swapchainDetails.m_capabilities.minImageCount + m_swapchainImageAmount;
 			if (swapchainDetails.m_capabilities.maxImageCount > 0 && imageCount > swapchainDetails.m_capabilities.maxImageCount) {
 				imageCount = swapchainDetails.m_capabilities.maxImageCount;
 			}
@@ -70,6 +70,40 @@ namespace gloria::core {
 			vkGetSwapchainImagesKHR(device, m_swapChain, &imageCount, m_swapchainImages.data());
 		}
 
+		VkImageView createImageView(VkDevice device, VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
+			VkImageViewCreateInfo createInfo = {
+				.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+				.image = image,
+				.viewType = VK_IMAGE_VIEW_TYPE_2D,
+				.format = format,
+				.components = {
+					.r = VK_COMPONENT_SWIZZLE_IDENTITY,
+					.g = VK_COMPONENT_SWIZZLE_IDENTITY,
+					.b = VK_COMPONENT_SWIZZLE_IDENTITY,
+					.a = VK_COMPONENT_SWIZZLE_IDENTITY
+				},
+				.subresourceRange = {
+					.aspectMask = aspectFlags,
+					.baseMipLevel = 0,
+					.levelCount = 1,
+					.baseArrayLayer = 0,
+					.layerCount = 1
+				}
+			};
+
+			VkImageView imageView;
+			VK_VALIDATE(vkCreateImageView(device, &createInfo, nullptr, &imageView) != VK_SUCCESS, "Failed to create image views!");
+
+			return imageView;
+		}
+
+		void CreateSwapchainImageViews(VkDevice device) {
+			m_swapchainImageViews.resize(m_swapchainImages.size());
+			for (int i = 0; i < m_swapchainImages.size(); ++i) {
+				m_swapchainImageViews[i] = createImageView(device, m_swapchainImages[i], m_surfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT);
+			}
+		}
+
 		void destroy(VkDevice device) {
 			vkDestroySwapchainKHR(device, m_swapChain, nullptr);
 		}
@@ -78,12 +112,24 @@ namespace gloria::core {
 			return m_swapChain;
 		}
 
+		VkExtent2D getExtent() {
+			return m_extent;
+		}
+
+		VkSurfaceFormatKHR getFormat() const {
+			return m_surfaceFormat;
+		}
+
+	public:
+		std::vector<VkImage> m_swapchainImages;
+		std::vector<VkImageView> m_swapchainImageViews;
 	private:
 		VkSwapchainKHR m_swapChain;
 		VkSurfaceFormatKHR m_surfaceFormat;
 		VkPresentModeKHR m_presentMode;
 		VkExtent2D m_extent;
 
-		std::vector<VkImage> m_swapchainImages;
+		// amount of images the swapchain should store
+		static constexpr int m_swapchainImageAmount = 1;
 	};
 }

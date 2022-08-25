@@ -44,7 +44,14 @@ namespace gloria::core {
 			createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());;
 			createInfo.pQueueCreateInfos = queueCreateInfos.data();
 
+			VkPhysicalDeviceVulkan13Features dynamicRendering = {
+				.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES,
+				.dynamicRendering = VK_TRUE
+			};
+
 			createInfo.pEnabledFeatures = &deviceFeatures;
+
+			createInfo.pNext = &dynamicRendering;
 
 			createInfo.enabledExtensionCount = static_cast<uint32_t>(g_deviceExtensions.size());
 			createInfo.ppEnabledExtensionNames = g_deviceExtensions.data();

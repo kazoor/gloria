@@ -45,12 +45,6 @@ namespace gloria::core {
 			else {
 				throw std::runtime_error("Failed to find a suitable GPU");
 			}
-
-#ifdef DEBUG
-			VkPhysicalDeviceProperties deviceProperties;
-			vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
-			GL_CORE_INFO("DEVICES: {0}, DEVICE_NAME: {1}, VENDOR_ID: {2}, DRIVER_VERSION: {3}", devices.size(), deviceProperties.deviceName, deviceProperties.vendorID, deviceProperties.driverVersion);
-#endif // DEBUG
 		}
 
 		VkPhysicalDevice getPhysicalDevice() {

@@ -16,6 +16,8 @@
 #include "../vulkan/logicaldevice/logicaldevice.hpp"
 #include "../vulkan/surface/windowsurface.hpp"
 #include "../vulkan/swapchain/swapchain.hpp"
+#include "../vulkan/graphicspipeline/graphicspipeline.hpp"
+#include "../vulkan/commandbuffers/commandbuffers.hpp"
 
 inline VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
 	auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
@@ -93,9 +95,13 @@ namespace gloria::core {
 			createVulkanInstance();
 			setupDebugMessenger();
 			m_surface = WindowSurface(m_vkInstance, *m_window);
-			m_PhysicalDevice = PhysicalDevice(m_vkInstance, m_surface);
-			m_LogicalDevice = LogicalDevice(m_PhysicalDevice, m_layers, m_surface);
-			m_swapChain = Swapchain(m_PhysicalDevice.getPhysicalDevice(), m_LogicalDevice.getDevice(), m_surface);
+			m_physicalDevice = PhysicalDevice(m_vkInstance, m_surface);
+			m_logicalDevice = LogicalDevice(m_physicalDevice, m_layers, m_surface);
+			m_swapchain = Swapchain(m_physicalDevice.getPhysicalDevice(), m_logicalDevice.getDevice(), m_surface);
+			m_swapchain.CreateSwapchainImageViews(m_logicalDevice.getDevice());
+			m_graphicsPipeline = GraphicsPipeline(m_logicalDevice.getDevice(), m_swapchain);
+			m_commandPool = CommandPool(m_logicalDevice.getDevice(), m_physicalDevice.getPhysicalDevice(), m_surface);
+			m_commandBuffer = CommandBuffer(m_logicalDevice.getDevice(), m_commandPool);
 		}
 
 		void mainLoop() {
@@ -103,13 +109,21 @@ namespace gloria::core {
 				glfwPollEvents();
 			}
 
-			vkDeviceWaitIdle(m_LogicalDevice.getDevice());
+			vkDeviceWaitIdle(m_logicalDevice.getDevice());
 		}
 
 		void cleanup() {
-			m_swapChain.destroy(m_LogicalDevice.getDevice());
+			m_commandPool.destroy(m_logicalDevice.getDevice());
 
-			vkDestroyDevice(m_LogicalDevice.getDevice(), nullptr);
+			m_graphicsPipeline.destroy(m_logicalDevice.getDevice());
+
+			for (const auto& imageView : m_swapchain.m_swapchainImageViews) {
+				vkDestroyImageView(m_logicalDevice.getDevice(), imageView, nullptr);
+			}
+
+			m_swapchain.destroy(m_logicalDevice.getDevice());
+
+			vkDestroyDevice(m_logicalDevice.getDevice(), nullptr);
 
 			if (m_layers->isEnabled())
 				DestroyDebugUtilsMessengerEXT(m_vkInstance, m_debugMessenger, nullptr);
@@ -187,8 +201,11 @@ namespace gloria::core {
 		VkDebugUtilsMessengerEXT m_debugMessenger;
 		ValidationLayer* m_layers;
 		WindowSurface m_surface;
-		PhysicalDevice m_PhysicalDevice;
-		LogicalDevice m_LogicalDevice;
-		Swapchain m_swapChain;
+		PhysicalDevice m_physicalDevice;
+		LogicalDevice m_logicalDevice;
+		Swapchain m_swapchain;
+		GraphicsPipeline m_graphicsPipeline;
+		CommandPool m_commandPool;
+		CommandBuffer m_commandBuffer;
 	};
 }

@@ -5,7 +5,8 @@
   throw std::runtime_error("Vulkan Error: " fmt )
 
 inline static const std::vector<const char*> g_deviceExtensions = {
-	VK_KHR_SWAPCHAIN_EXTENSION_NAME
+	VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+	VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME
 };
 
 inline static const std::vector<const char*> g_validationLayers = {
