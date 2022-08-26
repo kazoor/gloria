@@ -1,6 +1,7 @@
 #include "vulkanrenderer.hpp"
 #include <vulkan/vulkan.h>
 #include <iostream>
+#include "../../defines.hpp"
 #include "../graphicspipeline/graphicspipeline.hpp"
 #include "../swapchain/swapchain.hpp"
 #include "../commandbuffers/commandbuffers.hpp"
@@ -47,8 +48,6 @@ namespace gloria::core {
 
 		VK_VALIDATE(vkQueueSubmit(m_device.getGraphicsQueue(), 1, &submitInfo, m_swapchain.m_inFlightFences[m_currentFrame]), "Failed to submit draw command buffer");
 
-		m_currentFrame = (m_currentFrame + 1) & MAX_FRAMES_IN_FLIGHT;
-
 		VkSubpassDependency dependency{};
 
 		VkSwapchainKHR swapchains[] = { m_swapchain.getSwapchain() };
@@ -63,6 +62,8 @@ namespace gloria::core {
 		};
 
 		vkQueuePresentKHR(m_device.getPresentQueue(), &presentInfo);
+
+		m_currentFrame = (m_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 	}
 
 	void VulkanRenderer::recordCommandBuffer(VkCommandBuffer commandBuffer, GraphicsPipeline pipeline, Swapchain swapchain, std::uint32_t imageIndex) {
