@@ -63,6 +63,11 @@ namespace gloria::core {
 
 		VK_VALIDATE(vkCreateSwapchainKHR(device, &createInfo, nullptr, &mSwapChain), "Failed to create swapchain");
 
+#ifdef DEBUG
+		if (mSwapChain != VK_NULL_HANDLE)
+			GL_CORE_INFO("Swapchain has been created");
+#endif // DEBUG
+
 		vkGetSwapchainImagesKHR(device, mSwapChain, &imageCount, nullptr);
 		swapchainImages.resize(imageCount);
 		vkGetSwapchainImagesKHR(device, mSwapChain, &imageCount, swapchainImages.data());
@@ -92,6 +97,11 @@ namespace gloria::core {
 		VkImageView imageView;
 		VK_VALIDATE(vkCreateImageView(device, &createInfo, nullptr, &imageView), "Failed to create image views!");
 
+#ifdef DEBUG
+		if (imageView != VK_NULL_HANDLE)
+			GL_CORE_INFO("ImageView has been created");
+#endif // DEBUG
+
 		return imageView;
 	}
 
@@ -120,6 +130,11 @@ namespace gloria::core {
 			VK_VALIDATE(vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) ||
 				vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) ||
 				vkCreateFence(device, &fenceInfo, nullptr, &inFlightFences[i]), "Failed to create semaphores");
+
+#ifdef DEBUG
+			if (!imageAvailableSemaphores.empty())
+				GL_CORE_INFO("imageAvailableSemaphores has been created");
+#endif // DEBUG
 		}
 	}
 

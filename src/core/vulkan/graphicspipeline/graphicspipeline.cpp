@@ -160,10 +160,12 @@ namespace gloria::core {
 		};
 
 		VK_VALIDATE(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &mPipeline), "Failed to create graphics pipeline");
+
 #ifdef DEBUG 
 		if (mPipeline != VK_NULL_HANDLE)
 			GL_CORE_INFO("Graphics pipeline created!");
 #endif // DEBUG
+
 		vkDestroyShaderModule(device, vertModule, nullptr);
 		vkDestroyShaderModule(device, fragModule, nullptr);
 	}
@@ -177,10 +179,12 @@ namespace gloria::core {
 
 		VkShaderModule shaderModule;
 		VK_VALIDATE(vkCreateShaderModule(device, &createInfo, nullptr, &shaderModule), "Failed to create shader module");
+
 #ifdef DEBUG 
-		if (mPipeline != VK_NULL_HANDLE)
-			GL_CORE_INFO("Graphics pipeline created!");
+		if (shaderModule != VK_NULL_HANDLE)
+			GL_CORE_INFO("Shader module pipeline created!");
 #endif // DEBUG
+
 		return shaderModule;
 	}
 

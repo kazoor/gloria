@@ -9,14 +9,19 @@ namespace gloria::core {
 	WindowSurface::~WindowSurface() {}
 
 	void WindowSurface::createWindowSurface(VkInstance instance, Window window) {
-		VK_VALIDATE(glfwCreateWindowSurface(instance, window.getWindowPtr(), nullptr, &m_surface), "Failed to create a window surface");
+		VK_VALIDATE(glfwCreateWindowSurface(instance, window.getWindowPtr(), nullptr, &mSurface), "Failed to create a window surface");
+
+#ifdef DEBUG
+		if (mSurface != VK_NULL_HANDLE)
+			GL_CORE_INFO("Window surface has been created");
+#endif // DEBUG
 	}
 
 	void WindowSurface::destroy(VkInstance instance) {
-		vkDestroySurfaceKHR(instance, m_surface, nullptr);
+		vkDestroySurfaceKHR(instance, mSurface, nullptr);
 	}
 
 	VkSurfaceKHR WindowSurface::getSurface() {
-		return m_surface;
+		return mSurface;
 	}
 }

@@ -20,6 +20,6 @@ namespace gloria::core {
 		VkSurfaceKHR getSurface();
 
 	private:
-		VkSurfaceKHR m_surface;
+		VkSurfaceKHR mSurface;
 	};
 }

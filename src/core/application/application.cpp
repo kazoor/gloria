@@ -143,6 +143,12 @@ namespace gloria::core {
 		}
 
 		VK_VALIDATE(vkCreateInstance(&createInfo, nullptr, &mVkInstance), "Failed to create a Vulkan instance!");
+
+#ifdef DEBUG
+		if (mVkInstance != VK_NULL_HANDLE)
+			GL_CORE_INFO("mVkInstance has been created");
+#endif // DEBUG
+
 	}
 
 	void Application::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
@@ -160,6 +166,11 @@ namespace gloria::core {
 		populateDebugMessengerCreateInfo(createInfo);
 
 		VK_VALIDATE(CreateDebugUtilsMessengerEXT(mVkInstance, &createInfo, nullptr, &mDebugMessenger), "Failed to set up debug messenger!");
+
+#ifdef DEBUG
+		if (mDebugMessenger != VK_NULL_HANDLE)
+			GL_CORE_INFO("mDebugMessenger has been created");
+#endif // DEBUG
 	}
 
 }

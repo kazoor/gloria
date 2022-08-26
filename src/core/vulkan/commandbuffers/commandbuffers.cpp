@@ -55,7 +55,7 @@ namespace gloria::core {
 		VK_VALIDATE(vkAllocateCommandBuffers(device, &allocInfo, CommandBuffers.data()), "Failed to allocate command buffers");
 #ifdef DEBUG
 		if (!CommandBuffers.empty())
-			GL_CORE_INFO("Command buffers created!");
+			GL_CORE_INFO("Command buffer created!");
 #endif // DEBUG
 	}
 }
