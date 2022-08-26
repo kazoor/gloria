@@ -49,15 +49,19 @@ namespace gloria::core {
 
 		std::string deviceName = deviceProperties.deviceName;
 
-		mGpuInfo.apiVersion = deviceProperties.apiVersion;
-		mGpuInfo.driverVersion = deviceProperties.driverVersion;
-		mGpuInfo.vendorID = deviceProperties.vendorID;
-		mGpuInfo.deviceID = deviceProperties.deviceID;
-		mGpuInfo.deviceType = static_cast<std::uint32_t>(deviceProperties.deviceType);
-		mGpuInfo.deviceName = deviceName;
-		mGpuInfo.pipelineCacheUUID = deviceProperties.pipelineCacheUUID;
-		mGpuInfo.limits = deviceProperties.limits;
-		mGpuInfo.sparseProperties = deviceProperties.sparseProperties;
+		GpuInfo gpuInfo = {
+			.apiVersion = deviceProperties.apiVersion,
+			.driverVersion = deviceProperties.driverVersion,
+			.vendorID = deviceProperties.vendorID,
+			.deviceID = deviceProperties.deviceID,
+			.deviceType = static_cast<std::uint32_t>(deviceProperties.deviceType),
+			.deviceName = deviceName,
+			.pipelineCacheUUID = deviceProperties.pipelineCacheUUID,
+			.limits = deviceProperties.limits,
+			.sparseProperties = deviceProperties.sparseProperties,
+		};
+
+		mGpuInfo = gpuInfo;
 	}
 
 	VkPhysicalDevice PhysicalDevice::getPhysicalDevice() {
