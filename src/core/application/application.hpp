@@ -118,9 +118,11 @@ namespace gloria::core {
 		}
 
 		void cleanup() {
-			vkDestroySemaphore(m_logicalDevice.getDevice(), m_swapchain.getImageAvailableSemaphore(), nullptr);
-			vkDestroySemaphore(m_logicalDevice.getDevice(), m_swapchain.getRenderFinishedSemaphore(), nullptr);
-			vkDestroyFence(m_logicalDevice.getDevice(), m_swapchain.getInFlightFence(), nullptr);
+			for (std::size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+				vkDestroySemaphore(m_logicalDevice.getDevice(), m_swapchain.m_imageAvailableSemaphores[i], nullptr);
+				vkDestroySemaphore(m_logicalDevice.getDevice(), m_swapchain.m_renderFinishedSemaphores[i], nullptr);
+				vkDestroyFence(m_logicalDevice.getDevice(), m_swapchain.m_inFlightFences[i], nullptr);
+			}
 
 			m_commandPool.destroy(m_logicalDevice.getDevice());
 

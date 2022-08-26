@@ -1,6 +1,8 @@
 #pragma once
 #include "logger/logger.hpp"
 
+constexpr int MAX_FRAMES_IN_FLIGHT = 2;
+
 #define VK_VALIDATE( chck, fmt ) if( chck != VK_SUCCESS ) \
   throw std::runtime_error("Vulkan Error: " fmt )
 

@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include <vulkan/vulkan.h>
 #include "../surface/windowsurface.hpp"
 #include "../graphicspipeline/graphicspipeline.hpp"
@@ -35,8 +36,6 @@ namespace gloria::core {
 
 		void createCommandBuffer(VkDevice device, CommandPool pool);
 
-		VkCommandBuffer getCommandBuffer();
-	private:
-		VkCommandBuffer m_commandBuffer;
+		std::vector<VkCommandBuffer> m_commandBuffers;
 	};
 }

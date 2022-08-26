@@ -103,6 +103,10 @@ namespace gloria::core {
 	}
 
 	void Swapchain::createSyncObjects(VkDevice device) {
+		m_imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+		m_renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+		m_inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
+
 		VkSemaphoreCreateInfo semaphoreInfo = {
 			.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO
 		};
@@ -112,9 +116,11 @@ namespace gloria::core {
 			.flags = VK_FENCE_CREATE_SIGNALED_BIT
 		};
 
-		VK_VALIDATE(vkCreateSemaphore(device, &semaphoreInfo, nullptr, &m_imageAvailableSemaphore) ||
-			vkCreateSemaphore(device, &semaphoreInfo, nullptr, &m_renderFinishedSemaphore) ||
-			vkCreateFence(device, &fenceInfo, nullptr, &m_inFlightFence), "Failed to create semaphores");
+		for (std::size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+			VK_VALIDATE(vkCreateSemaphore(device, &semaphoreInfo, nullptr, &m_imageAvailableSemaphores[i]) ||
+				vkCreateSemaphore(device, &semaphoreInfo, nullptr, &m_renderFinishedSemaphores[i]) ||
+				vkCreateFence(device, &fenceInfo, nullptr, &m_inFlightFences[i]), "Failed to create semaphores");
+		}
 	}
 
 	void Swapchain::destroy(VkDevice device) {
@@ -135,19 +141,5 @@ namespace gloria::core {
 
 	VkPresentModeKHR Swapchain::getPresentMode() {
 		return m_presentMode;
-	}
-
-	VkSemaphore Swapchain::getImageAvailableSemaphore()
-	{
-		return m_imageAvailableSemaphore;
-	}
-
-	VkSemaphore Swapchain::getRenderFinishedSemaphore()
-	{
-		return m_renderFinishedSemaphore;
-	}
-
-	VkFence Swapchain::getInFlightFence() const {
-		return m_inFlightFence;
 	}
 }

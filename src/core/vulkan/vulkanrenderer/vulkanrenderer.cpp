@@ -20,38 +20,34 @@ namespace gloria::core {
 	}
 
 	void VulkanRenderer::drawFrame() {
-		auto inFlightFence = m_swapchain.getInFlightFence();
-		auto imageAvailableSemaphore = m_swapchain.getImageAvailableSemaphore();
-		auto renderFinishedSemaphore = m_swapchain.getRenderFinishedSemaphore();
-
-		vkWaitForFences(m_device.getDevice(), 1, &inFlightFence, VK_TRUE, UINT64_MAX);
-		vkResetFences(m_device.getDevice(), 1, &inFlightFence);
+		vkWaitForFences(m_device.getDevice(), 1, &m_swapchain.m_inFlightFences[m_currentFrame], VK_TRUE, UINT64_MAX);
+		vkResetFences(m_device.getDevice(), 1, &m_swapchain.m_inFlightFences[m_currentFrame]);
 
 		std::uint32_t imageIndex;
-		vkAcquireNextImageKHR(m_device.getDevice(), m_swapchain.getSwapchain(), UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+		vkAcquireNextImageKHR(m_device.getDevice(), m_swapchain.getSwapchain(), UINT64_MAX, m_swapchain.m_imageAvailableSemaphores[m_currentFrame], VK_NULL_HANDLE, &imageIndex);
 
 		// auto commandBuffer = m_commandBuffer.getCommandBuffer();
 		// vkResetCommandBuffer(commandBuffer, 0);
 
-		auto commandBuffer = m_commandBuffer.getCommandBuffer();
+		recordCommandBuffer(m_commandBuffer.m_commandBuffers[m_currentFrame], m_pipeline, m_swapchain, imageIndex);
 
-		recordCommandBuffer(commandBuffer, m_pipeline, m_swapchain, imageIndex);
-
-		VkSemaphore waitSemaphores[] = { imageAvailableSemaphore };
+		VkSemaphore waitSemaphores[] = { m_swapchain.m_imageAvailableSemaphores[m_currentFrame] };
 		VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
-		VkSemaphore signalSemaphores[] = { renderFinishedSemaphore };
+		VkSemaphore signalSemaphores[] = { m_swapchain.m_renderFinishedSemaphores[m_currentFrame] };
 
 		VkSubmitInfo submitInfo = {
 			.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
 			.pWaitSemaphores = waitSemaphores,
 			.pWaitDstStageMask = waitStages,
 			.commandBufferCount = 1,
-			.pCommandBuffers = &commandBuffer,
+			.pCommandBuffers = &m_commandBuffer.m_commandBuffers[m_currentFrame],
 			.signalSemaphoreCount = 1,
 			.pSignalSemaphores = signalSemaphores
 		};
 
-		VK_VALIDATE(vkQueueSubmit(m_device.getGraphicsQueue(), 1, &submitInfo, inFlightFence), "Failed to submit draw command buffer");
+		VK_VALIDATE(vkQueueSubmit(m_device.getGraphicsQueue(), 1, &submitInfo, m_swapchain.m_inFlightFences[m_currentFrame]), "Failed to submit draw command buffer");
+
+		m_currentFrame = (m_currentFrame + 1) & MAX_FRAMES_IN_FLIGHT;
 
 		VkSubpassDependency dependency{};
 

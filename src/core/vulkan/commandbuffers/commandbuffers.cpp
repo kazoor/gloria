@@ -39,17 +39,15 @@ namespace gloria::core {
 	CommandBuffer::~CommandBuffer() {}
 
 	void CommandBuffer::createCommandBuffer(VkDevice device, CommandPool pool) {
+		m_commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+
 		VkCommandBufferAllocateInfo allocInfo = {
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
 			.commandPool = pool.getCommandPool(),
 			.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-			.commandBufferCount = 1
+			.commandBufferCount = static_cast<std::uint32_t>(m_commandBuffers.size())
 		};
 
-		VK_VALIDATE(vkAllocateCommandBuffers(device, &allocInfo, &m_commandBuffer), "Failed to allocate command buffers");
-	}
-
-	VkCommandBuffer CommandBuffer::getCommandBuffer() {
-		return m_commandBuffer;
+		VK_VALIDATE(vkAllocateCommandBuffers(device, &allocInfo, m_commandBuffers.data()), "Failed to allocate command buffers");
 	}
 }

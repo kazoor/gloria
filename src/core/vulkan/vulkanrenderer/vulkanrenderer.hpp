@@ -28,5 +28,6 @@ namespace gloria::core {
 		Swapchain m_swapchain;
 		CommandBuffer m_commandBuffer;
 		GraphicsPipeline m_pipeline;
+		std::uint32_t m_currentFrame = 0;
 	};
 }
