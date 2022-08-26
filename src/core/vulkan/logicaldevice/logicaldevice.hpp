@@ -1,6 +1,5 @@
 #pragma once
 #include <vulkan/vulkan.h>
-#include <set>
 #include "../../defines.hpp"
 #include "../queuefamilyindices/queuefamilyindices.hpp"
 #include "../validationlayer/validationlayer.hpp"
@@ -27,8 +26,8 @@ namespace gloria::core {
 		VkQueue getPresentQueue();
 
 	private:
-		VkDevice m_device;
-		VkQueue m_graphicsQueue;
-		VkQueue m_presentQueue;
+		VkDevice mDevice;
+		VkQueue mGraphicsQueue;
+		VkQueue mPresentQueue;
 	};
 }

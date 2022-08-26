@@ -1,60 +1,24 @@
 #pragma once
 #include <vulkan/vulkan.h>
+#include <GLFW/glfw3.h>
 #include <iostream>
 #include <vector>
 #include "../../defines.hpp"
 
 class ValidationLayer {
 public:
-	ValidationLayer() {}
+	ValidationLayer();
 
-	bool checkValidationLayerSupport() {
-		std::uint32_t layerCount;
-		vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+	bool checkValidationLayerSupport();
 
-		std::vector<VkLayerProperties> layers(layerCount);
-		vkEnumerateInstanceLayerProperties(&layerCount, layers.data());
+	std::vector<const char*> getRequiredExtensions();
 
-		for (const auto& layer : g_validationLayers) {
-			bool found = false;
-
-			for (const auto& properties : layers) {
-				if (!strcmp(layer, properties.layerName)) {
-					found = true;
-					break;
-				}
-			}
-
-			if (!found)
-				return false;
-		}
-
-		return true;
-	}
-
-	std::vector<const char*> getRequiredExtensions() {
-		uint32_t glfwExtensionCount = 0;
-		const char** glfwExtensions;
-		glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-
-		std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
-
-		if (m_enabled) {
-			extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-		}
-
-		return extensions;
-	}
-
-public:
-	bool isEnabled() {
-		return m_enabled;
-	}
+	bool isEnabled();
 
 private:
 #ifdef DEBUG
-	const bool m_enabled = true;
+	const bool mEnabled = true;
 #else
-	const bool m_enabled = false;
+	const bool mEnabled = false;
 #endif
 };

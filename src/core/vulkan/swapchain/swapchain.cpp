@@ -21,30 +21,30 @@ namespace gloria::core {
 		SwapchainSupport swapchainSupport(physicalDevice, surface.getSurface());
 		auto swapchainDetails = swapchainSupport.getSwapchainSupportDetails();
 
-		m_surfaceFormat = swapchainSupport.selectSwapSurfaceFormat(swapchainDetails.m_formats);
-		m_presentMode = swapchainSupport.selectSwapPresentMode(swapchainDetails.m_presentModes);
-		m_extent = swapchainSupport.selectSwapExtent(swapchainDetails.m_capabilities);
+		mSurfaceFormat = swapchainSupport.selectSwapSurfaceFormat(swapchainDetails.formats);
+		mPresentMode = swapchainSupport.selectSwapPresentMode(swapchainDetails.presentModes);
+		mExtent = swapchainSupport.selectSwapExtent(swapchainDetails.capabilities);
 
-		std::uint32_t imageCount = swapchainDetails.m_capabilities.minImageCount + m_swapchainImageAmount;
-		if (swapchainDetails.m_capabilities.maxImageCount > 0 && imageCount > swapchainDetails.m_capabilities.maxImageCount) {
-			imageCount = swapchainDetails.m_capabilities.maxImageCount;
+		std::uint32_t imageCount = swapchainDetails.capabilities.minImageCount + mSwapchainImageAmount;
+		if (swapchainDetails.capabilities.maxImageCount > 0 && imageCount > swapchainDetails.capabilities.maxImageCount) {
+			imageCount = swapchainDetails.capabilities.maxImageCount;
 		}
 
 		VkSwapchainCreateInfoKHR createInfo = {
 			.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
 			.surface = surface.getSurface(),
 			.minImageCount = imageCount,
-			.imageFormat = m_surfaceFormat.format,
-			.imageColorSpace = m_surfaceFormat.colorSpace,
-			.imageExtent = m_extent,
+			.imageFormat = mSurfaceFormat.format,
+			.imageColorSpace = mSurfaceFormat.colorSpace,
+			.imageExtent = mExtent,
 			.imageArrayLayers = 1,
 			.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT
 		};
 
 		QueueFamilyIndices indices(physicalDevice, surface);
-		std::uint32_t queueFamilyIndices[] = { indices.m_graphicsFamily.value(), indices.m_presentFamily.value() };
+		std::uint32_t queueFamilyIndices[] = { indices.graphicsFamily.value(), indices.presentFamily.value() };
 
-		if (indices.m_graphicsFamily != indices.m_presentFamily) {
+		if (indices.graphicsFamily != indices.presentFamily) {
 			createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
 			createInfo.queueFamilyIndexCount = 2;
 			createInfo.pQueueFamilyIndices = queueFamilyIndices;
@@ -55,17 +55,17 @@ namespace gloria::core {
 			createInfo.pQueueFamilyIndices = nullptr;
 		}
 
-		createInfo.preTransform = swapchainDetails.m_capabilities.currentTransform;
+		createInfo.preTransform = swapchainDetails.capabilities.currentTransform;
 		createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-		createInfo.presentMode = m_presentMode;
+		createInfo.presentMode = mPresentMode;
 		createInfo.clipped = VK_TRUE;
 		createInfo.oldSwapchain = VK_NULL_HANDLE;
 
-		VK_VALIDATE(vkCreateSwapchainKHR(device, &createInfo, nullptr, &m_swapChain), "Failed to create swapchain");
+		VK_VALIDATE(vkCreateSwapchainKHR(device, &createInfo, nullptr, &mSwapChain), "Failed to create swapchain");
 
-		vkGetSwapchainImagesKHR(device, m_swapChain, &imageCount, nullptr);
-		m_swapchainImages.resize(imageCount);
-		vkGetSwapchainImagesKHR(device, m_swapChain, &imageCount, m_swapchainImages.data());
+		vkGetSwapchainImagesKHR(device, mSwapChain, &imageCount, nullptr);
+		swapchainImages.resize(imageCount);
+		vkGetSwapchainImagesKHR(device, mSwapChain, &imageCount, swapchainImages.data());
 	}
 
 	VkImageView createImageView(VkDevice device, VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
@@ -96,16 +96,16 @@ namespace gloria::core {
 	}
 
 	void Swapchain::CreateSwapchainImageViews(VkDevice device) {
-		m_swapchainImageViews.resize(m_swapchainImages.size());
-		for (int i = 0; i < m_swapchainImages.size(); ++i) {
-			m_swapchainImageViews[i] = createImageView(device, m_swapchainImages[i], m_surfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT);
+		swapchainImageViews.resize(swapchainImages.size());
+		for (int i = 0; i < swapchainImages.size(); ++i) {
+			swapchainImageViews[i] = createImageView(device, swapchainImages[i], mSurfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT);
 		}
 	}
 
 	void Swapchain::createSyncObjects(VkDevice device) {
-		m_imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-		m_renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-		m_inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
+		imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+		renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+		inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
 
 		VkSemaphoreCreateInfo semaphoreInfo = {
 			.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO
@@ -117,29 +117,29 @@ namespace gloria::core {
 		};
 
 		for (std::size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-			VK_VALIDATE(vkCreateSemaphore(device, &semaphoreInfo, nullptr, &m_imageAvailableSemaphores[i]) ||
-				vkCreateSemaphore(device, &semaphoreInfo, nullptr, &m_renderFinishedSemaphores[i]) ||
-				vkCreateFence(device, &fenceInfo, nullptr, &m_inFlightFences[i]), "Failed to create semaphores");
+			VK_VALIDATE(vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) ||
+				vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) ||
+				vkCreateFence(device, &fenceInfo, nullptr, &inFlightFences[i]), "Failed to create semaphores");
 		}
 	}
 
 	void Swapchain::destroy(VkDevice device) {
-		vkDestroySwapchainKHR(device, m_swapChain, nullptr);
+		vkDestroySwapchainKHR(device, mSwapChain, nullptr);
 	}
 
 	VkSwapchainKHR Swapchain::getSwapchain() {
-		return m_swapChain;
+		return mSwapChain;
 	}
 
 	VkExtent2D Swapchain::getExtent() {
-		return m_extent;
+		return mExtent;
 	}
 
 	VkSurfaceFormatKHR Swapchain::getFormat() const {
-		return m_surfaceFormat;
+		return mSurfaceFormat;
 	}
 
 	VkPresentModeKHR Swapchain::getPresentMode() {
-		return m_presentMode;
+		return mPresentMode;
 	}
 }

@@ -19,14 +19,14 @@ namespace gloria::core {
 		VkShaderModule createShaderModule(VkDevice device, const std::vector<char>& code);
 
 		VkPipeline getPipeline() {
-			return m_pipeline;
+			return mPipeline;
 		}
 
 		void destroy(VkDevice device);
 
 	private:
-		VkViewport m_viewport;
-		VkPipelineLayout m_pipelineLayout;
-		VkPipeline m_pipeline;
+		VkViewport mViewport;
+		VkPipelineLayout mPipelineLayout;
+		VkPipeline mPipeline;
 	};
 }

@@ -125,7 +125,11 @@ namespace gloria::core {
 			.pPushConstantRanges = nullptr
 		};
 
-		VK_VALIDATE(vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &m_pipelineLayout), "Failed to create pipeline layout");
+		VK_VALIDATE(vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &mPipelineLayout), "Failed to create pipeline layout");
+#ifdef DEBUG 
+		if (mPipelineLayout != VK_NULL_HANDLE)
+			GL_CORE_INFO("Graphics pipeline layout created!");
+#endif // DEBUG
 
 		auto format = swapchain.getFormat().format;
 		const VkPipelineRenderingCreateInfoKHR pipelineRenderingCreateInfo = {
@@ -148,15 +152,18 @@ namespace gloria::core {
 			.pDepthStencilState = nullptr,
 			.pColorBlendState = &colorBlendingInfo,
 			.pDynamicState = &dynamicStateInfo,
-			.layout = m_pipelineLayout,
+			.layout = mPipelineLayout,
 			.renderPass = nullptr,
 			.subpass = 0,
 			.basePipelineHandle = VK_NULL_HANDLE,
 			.basePipelineIndex = -1
 		};
 
-		VK_VALIDATE(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_pipeline), "Failed to create graphics pipeline");
-
+		VK_VALIDATE(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &mPipeline), "Failed to create graphics pipeline");
+#ifdef DEBUG 
+		if (mPipeline != VK_NULL_HANDLE)
+			GL_CORE_INFO("Graphics pipeline created!");
+#endif // DEBUG
 		vkDestroyShaderModule(device, vertModule, nullptr);
 		vkDestroyShaderModule(device, fragModule, nullptr);
 	}
@@ -170,12 +177,15 @@ namespace gloria::core {
 
 		VkShaderModule shaderModule;
 		VK_VALIDATE(vkCreateShaderModule(device, &createInfo, nullptr, &shaderModule), "Failed to create shader module");
-
+#ifdef DEBUG 
+		if (mPipeline != VK_NULL_HANDLE)
+			GL_CORE_INFO("Graphics pipeline created!");
+#endif // DEBUG
 		return shaderModule;
 	}
 
 	void GraphicsPipeline::destroy(VkDevice device) {
-		vkDestroyPipeline(device, m_pipeline, nullptr);
-		vkDestroyPipelineLayout(device, m_pipelineLayout, nullptr);
+		vkDestroyPipeline(device, mPipeline, nullptr);
+		vkDestroyPipelineLayout(device, mPipelineLayout, nullptr);
 	}
 }

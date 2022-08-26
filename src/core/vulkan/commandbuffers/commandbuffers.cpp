@@ -20,14 +20,18 @@ namespace gloria::core {
 		VkCommandPoolCreateInfo poolInfo = {
 			.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
 			.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
-			.queueFamilyIndex = indices.m_graphicsFamily.value()
+			.queueFamilyIndex = indices.graphicsFamily.value()
 		};
 
-		VK_VALIDATE(vkCreateCommandPool(device, &poolInfo, nullptr, &m_commandPool), "Failed to create command pool");
+		VK_VALIDATE(vkCreateCommandPool(device, &poolInfo, nullptr, &mCommandPool), "Failed to create command pool");
+#ifdef DEBUG
+		if (mCommandPool != VK_NULL_HANDLE)
+			GL_CORE_INFO("Command pool created!");
+#endif // DEBUG
 	}
 
 	void CommandPool::destroy(VkDevice device) {
-		vkDestroyCommandPool(device, m_commandPool, nullptr);
+		vkDestroyCommandPool(device, mCommandPool, nullptr);
 	}
 
 	CommandBuffer::CommandBuffer() {}
@@ -39,15 +43,19 @@ namespace gloria::core {
 	CommandBuffer::~CommandBuffer() {}
 
 	void CommandBuffer::createCommandBuffer(VkDevice device, CommandPool pool) {
-		m_commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+		CommandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 
 		VkCommandBufferAllocateInfo allocInfo = {
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
 			.commandPool = pool.getCommandPool(),
 			.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-			.commandBufferCount = static_cast<std::uint32_t>(m_commandBuffers.size())
+			.commandBufferCount = static_cast<std::uint32_t>(CommandBuffers.size())
 		};
 
-		VK_VALIDATE(vkAllocateCommandBuffers(device, &allocInfo, m_commandBuffers.data()), "Failed to allocate command buffers");
+		VK_VALIDATE(vkAllocateCommandBuffers(device, &allocInfo, CommandBuffers.data()), "Failed to allocate command buffers");
+#ifdef DEBUG
+		if (!CommandBuffers.empty())
+			GL_CORE_INFO("Command buffers created!");
+#endif // DEBUG
 	}
 }

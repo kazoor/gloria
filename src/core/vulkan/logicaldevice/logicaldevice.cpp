@@ -1,4 +1,5 @@
 #include "logicaldevice.hpp"
+#include <set>
 #include "../../defines.hpp"
 
 namespace gloria::core {
@@ -14,7 +15,7 @@ namespace gloria::core {
 		QueueFamilyIndices indices(physicalDevice.getPhysicalDevice(), surface);
 
 		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-		std::set<std::uint32_t> uniqueQueueFamilies = { indices.m_graphicsFamily.value(), indices.m_presentFamily.value() };
+		std::set<std::uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
 		float queuePriority = 1.0f;
 
 		for (std::uint32_t queueFamily : uniqueQueueFamilies) {
@@ -56,27 +57,32 @@ namespace gloria::core {
 			createInfo.enabledLayerCount = 0;
 		}
 
-		VK_VALIDATE(vkCreateDevice(physicalDevice.getPhysicalDevice(), &createInfo, nullptr, &m_device), "failed to create logical device!");
+		VK_VALIDATE(vkCreateDevice(physicalDevice.getPhysicalDevice(), &createInfo, nullptr, &mDevice), "failed to create logical device!");
 
-		vkGetDeviceQueue(m_device, indices.m_graphicsFamily.value(), 0, &m_graphicsQueue);
-		vkGetDeviceQueue(m_device, indices.m_presentFamily.value(), 0, &m_presentQueue);
+#ifdef DEBUG 
+		if (mDevice != VK_NULL_HANDLE)
+			GL_CORE_INFO("Logical device created!");
+#endif // DEBUG
+
+		vkGetDeviceQueue(mDevice, indices.graphicsFamily.value(), 0, &mGraphicsQueue);
+		vkGetDeviceQueue(mDevice, indices.presentFamily.value(), 0, &mPresentQueue);
 	}
 
 	void LogicalDevice::destroy() {
-		vkDestroyDevice(m_device, nullptr);
+		vkDestroyDevice(mDevice, nullptr);
 	}
 
 	VkDevice LogicalDevice::getDevice() {
-		return m_device;
+		return mDevice;
 	}
 
 	VkQueue LogicalDevice::getGraphicsQueue()
 	{
-		return m_graphicsQueue;
+		return mGraphicsQueue;
 	}
 
 	VkQueue LogicalDevice::getPresentQueue()
 	{
-		return m_presentQueue;
+		return mPresentQueue;
 	}
 }

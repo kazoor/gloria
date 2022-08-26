@@ -19,11 +19,11 @@ namespace gloria::core {
 		void destroy(VkDevice device);
 
 		VkCommandPool getCommandPool() {
-			return m_commandPool;
+			return mCommandPool;
 		}
 
 	private:
-		VkCommandPool m_commandPool;
+		VkCommandPool mCommandPool;
 	};
 
 	class CommandBuffer {
@@ -36,6 +36,6 @@ namespace gloria::core {
 
 		void createCommandBuffer(VkDevice device, CommandPool pool);
 
-		std::vector<VkCommandBuffer> m_commandBuffers;
+		std::vector<VkCommandBuffer> CommandBuffers;
 	};
 }

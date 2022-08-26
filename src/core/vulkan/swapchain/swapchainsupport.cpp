@@ -9,34 +9,34 @@
 
 namespace gloria::core {
 	SwapchainSupport::SwapchainSupport(VkPhysicalDevice device, VkSurfaceKHR surface) {
-		m_details = querySwapchainSupport(device, surface);
+		mDetails = querySwapchainSupport(device, surface);
 	}
 
 	SwapchainSupport::~SwapchainSupport() {}
 
 	SwapchainSupportDetails SwapchainSupport::getSwapchainSupportDetails() {
-		return m_details;
+		return mDetails;
 	}
 
 	SwapchainSupportDetails SwapchainSupport::querySwapchainSupport(VkPhysicalDevice device, VkSurfaceKHR surface) {
 		SwapchainSupportDetails details;
 
-		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.m_capabilities);
+		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
 
 		std::uint32_t formatCount;
 		vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
 
 		if (formatCount != 0) {
-			details.m_formats.resize(formatCount);
-			vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.m_formats.data());
+			details.formats.resize(formatCount);
+			vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.formats.data());
 		}
 
 		std::uint32_t presentModeCount;
 		vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, nullptr);
 
 		if (presentModeCount != 0) {
-			details.m_presentModes.resize(presentModeCount);
-			vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, details.m_presentModes.data());
+			details.presentModes.resize(presentModeCount);
+			vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, details.presentModes.data());
 		}
 
 		return details;

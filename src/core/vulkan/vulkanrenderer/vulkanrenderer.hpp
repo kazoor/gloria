@@ -24,10 +24,10 @@ namespace gloria::core {
 		void endFrame(VkImage swapchainImage, Swapchain swapchain, VkCommandBuffer commandBuffer, std::uint32_t imageIndex);
 
 	private:
-		LogicalDevice m_device;
-		Swapchain m_swapchain;
-		CommandBuffer m_commandBuffer;
-		GraphicsPipeline m_pipeline;
-		std::uint32_t m_currentFrame = 0;
+		LogicalDevice mDevice;
+		Swapchain mSwapchain;
+		CommandBuffer mCommandBuffer;
+		GraphicsPipeline mPipeline;
+		std::uint32_t mCurrentFrame = 0;
 	};
 }

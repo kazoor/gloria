@@ -22,7 +22,7 @@ namespace gloria::core {
 		}
 
 		GLFWwindow* getWindowPtr() const {
-			return m_window;
+			return pWindow;
 		}
 
 	private:
@@ -32,12 +32,12 @@ namespace gloria::core {
 			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 			glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-			m_window = glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
+			pWindow = glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
 		}
 
 	private:
 		std::uint32_t m_width, m_height;
 		std::string m_title;
-		GLFWwindow* m_window;
+		GLFWwindow* pWindow;
 	};
 }

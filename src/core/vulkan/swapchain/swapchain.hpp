@@ -31,19 +31,19 @@ namespace gloria::core {
 		VkPresentModeKHR getPresentMode();
 
 	public:
-		std::vector<VkImage> m_swapchainImages;
-		std::vector<VkImageView> m_swapchainImageViews;
-		std::vector<VkSemaphore> m_imageAvailableSemaphores;
-		std::vector<VkSemaphore> m_renderFinishedSemaphores;
-		std::vector<VkFence> m_inFlightFences;
+		std::vector<VkImage> swapchainImages;
+		std::vector<VkImageView> swapchainImageViews;
+		std::vector<VkSemaphore> imageAvailableSemaphores;
+		std::vector<VkSemaphore> renderFinishedSemaphores;
+		std::vector<VkFence> inFlightFences;
 
 	private:
-		VkSwapchainKHR m_swapChain;
-		VkSurfaceFormatKHR m_surfaceFormat;
-		VkPresentModeKHR m_presentMode;
-		VkExtent2D m_extent;
+		VkSwapchainKHR mSwapChain;
+		VkSurfaceFormatKHR mSurfaceFormat;
+		VkPresentModeKHR mPresentMode;
+		VkExtent2D mExtent;
 
 		// amount of images the swapchain should store
-		static constexpr int m_swapchainImageAmount = 1;
+		static constexpr int mSwapchainImageAmount = 1;
 	};
 }
