@@ -7,13 +7,11 @@
 namespace gloria::core {
 	class CommandPool {
 	public:
-		CommandPool() {}
+		CommandPool();
 
-		CommandPool(VkDevice device, VkPhysicalDevice physicalDevice, WindowSurface surface) {
-			createCommandPool(device, physicalDevice, surface);
-		}
+		CommandPool(VkDevice device, VkPhysicalDevice physicalDevice, WindowSurface surface);
 
-		~CommandPool() {}
+		~CommandPool();
 
 		void createCommandPool(VkDevice device, VkPhysicalDevice physicalDevice, WindowSurface surface);
 
@@ -29,21 +27,15 @@ namespace gloria::core {
 
 	class CommandBuffer {
 	public:
-		CommandBuffer() {}
+		CommandBuffer();
 
-		CommandBuffer(VkDevice device, CommandPool pool) {
-			createCommandBuffer(device, pool);
-		}
+		CommandBuffer(VkDevice device, CommandPool pool);
 
-		~CommandBuffer() {}
+		~CommandBuffer();
 
 		void createCommandBuffer(VkDevice device, CommandPool pool);
 
-		void recordCommandBuffer(VkCommandBuffer commandBuffer, GraphicsPipeline pipeline, Swapchain swapchain, std::uint32_t imageIndex);
-
-		void beginFrame(VkImage swapchainImage, Swapchain swapchain, VkCommandBuffer commandBuffer, std::uint32_t imageIndex);
-
-		void endFrame(VkImage swapchainImage, Swapchain swapchain, VkCommandBuffer commandBuffer, std::uint32_t imageIndex);
+		VkCommandBuffer getCommandBuffer();
 	private:
 		VkCommandBuffer m_commandBuffer;
 	};

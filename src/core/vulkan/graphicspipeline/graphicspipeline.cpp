@@ -40,10 +40,26 @@ namespace gloria::core {
 			.primitiveRestartEnable = VK_FALSE
 		};
 
+		VkViewport viewport = {
+			.x = 0.0f,
+			.y = 0.0f,
+			.width = static_cast<float>(swapchain.getExtent().width),
+			.height = static_cast<float>(swapchain.getExtent().width),
+			.minDepth = 0.0f,
+			.maxDepth = 1.0f,
+		};
+
+		VkRect2D scissor = {
+			.offset = { 0, 0 },
+			.extent = swapchain.getExtent()
+		};
+
 		VkPipelineViewportStateCreateInfo viewportStateInfo = {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
 			.viewportCount = 1,
+			.pViewports = &viewport,
 			.scissorCount = 1,
+			.pScissors = &scissor
 		};
 
 		VkPipelineRasterizationStateCreateInfo rasterizerInfo = {
@@ -109,7 +125,7 @@ namespace gloria::core {
 			.pPushConstantRanges = nullptr
 		};
 
-		VK_VALIDATE(vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS, "Failed to create pipeline layout");
+		VK_VALIDATE(vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &m_pipelineLayout), "Failed to create pipeline layout");
 
 		auto format = swapchain.getFormat().format;
 		const VkPipelineRenderingCreateInfoKHR pipelineRenderingCreateInfo = {
@@ -139,7 +155,7 @@ namespace gloria::core {
 			.basePipelineIndex = -1
 		};
 
-		VK_VALIDATE(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_pipeline) != VK_SUCCESS, "Failed to create graphics pipeline");
+		VK_VALIDATE(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_pipeline), "Failed to create graphics pipeline");
 
 		vkDestroyShaderModule(device, vertModule, nullptr);
 		vkDestroyShaderModule(device, fragModule, nullptr);
@@ -153,7 +169,7 @@ namespace gloria::core {
 		};
 
 		VkShaderModule shaderModule;
-		VK_VALIDATE(vkCreateShaderModule(device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS, "Failed to create shader module");
+		VK_VALIDATE(vkCreateShaderModule(device, &createInfo, nullptr, &shaderModule), "Failed to create shader module");
 
 		return shaderModule;
 	}

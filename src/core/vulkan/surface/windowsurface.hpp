@@ -15,7 +15,7 @@ namespace gloria::core {
 		~WindowSurface() {}
 
 		void createWindowSurface(VkInstance instance, Window window) {
-			VK_VALIDATE(glfwCreateWindowSurface(instance, window.getWindowPtr(), nullptr, &m_surface) != VK_SUCCESS, "Failed to create a window surface");
+			VK_VALIDATE(glfwCreateWindowSurface(instance, window.getWindowPtr(), nullptr, &m_surface), "Failed to create a window surface");
 		}
 
 		void destroy(VkInstance instance) {

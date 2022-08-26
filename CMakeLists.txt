@@ -10,8 +10,12 @@ add_executable(gloria
     "${CMAKE_CURRENT_SOURCE_DIR}/src/core/application/application.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/core/logger/logger.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/core/window/window.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core/vulkan/logicaldevice/logicaldevice.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/core/vulkan/graphicspipeline/graphicspipeline.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core/vulkan/swapchain/swapchain.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core/vulkan/swapchain/swapchainsupport.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/core/vulkan/commandbuffers/commandbuffers.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core/vulkan/vulkanrenderer/vulkanrenderer.cpp"
 )
 
 if (DEFINED VULKAN_SDK_PATH)
@@ -75,6 +79,9 @@ file(COPY ${SHADER_DIR}/${FILENAME}.spv
 
 file(COPY ${SHADER_DIR}/${FILENAME}.spv
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin/Debug/resources/shaders/)
+
+file(COPY ${SHADER_DIR}/${FILENAME}.spv
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/)
 endForeach()
 
 add_custom_target(shaders ALL DEPENDS ${SPV_SHADERS})

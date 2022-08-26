@@ -11,6 +11,9 @@ namespace gloria::core {
 	class Log
 	{
 	public:
+		Log() {}
+		~Log() { m_coreLogger.reset(); m_clientLogger.reset(); }
+
 		static void Init();
 		static Ref<spdlog::logger>& getCoreLogger() { return m_coreLogger; }
 		static Ref<spdlog::logger>& getClientLogger() { return m_clientLogger; }

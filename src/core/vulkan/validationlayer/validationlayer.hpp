@@ -45,6 +45,7 @@ public:
 
 		return extensions;
 	}
+
 public:
 	bool isEnabled() {
 		return m_enabled;

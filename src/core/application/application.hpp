@@ -18,6 +18,7 @@
 #include "../vulkan/swapchain/swapchain.hpp"
 #include "../vulkan/graphicspipeline/graphicspipeline.hpp"
 #include "../vulkan/commandbuffers/commandbuffers.hpp"
+#include "../vulkan/vulkanrenderer/vulkanrenderer.hpp"
 
 inline VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
 	auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
@@ -72,7 +73,9 @@ namespace gloria::core {
 
 	class Application {
 	public:
-		Application() {}
+		Application() {
+			Log::Init();
+		}
 
 		~Application() {
 			cleanup();
@@ -88,7 +91,6 @@ namespace gloria::core {
 	private:
 		void initWindow() {
 			m_window = std::make_unique<Window>(1920, 1080, "Gloria");
-			Log::Init();
 		}
 
 		void initVulkan() {
@@ -102,17 +104,24 @@ namespace gloria::core {
 			m_graphicsPipeline = GraphicsPipeline(m_logicalDevice.getDevice(), m_swapchain);
 			m_commandPool = CommandPool(m_logicalDevice.getDevice(), m_physicalDevice.getPhysicalDevice(), m_surface);
 			m_commandBuffer = CommandBuffer(m_logicalDevice.getDevice(), m_commandPool);
+			m_swapchain.createSyncObjects(m_logicalDevice.getDevice());
+			m_renderer = VulkanRenderer(m_logicalDevice, m_swapchain, m_graphicsPipeline, m_commandBuffer);
 		}
 
 		void mainLoop() {
 			while (!glfwWindowShouldClose(m_window.get()->getWindowPtr())) {
 				glfwPollEvents();
+				m_renderer.drawFrame();
 			}
 
 			vkDeviceWaitIdle(m_logicalDevice.getDevice());
 		}
 
 		void cleanup() {
+			vkDestroySemaphore(m_logicalDevice.getDevice(), m_swapchain.getImageAvailableSemaphore(), nullptr);
+			vkDestroySemaphore(m_logicalDevice.getDevice(), m_swapchain.getRenderFinishedSemaphore(), nullptr);
+			vkDestroyFence(m_logicalDevice.getDevice(), m_swapchain.getInFlightFence(), nullptr);
+
 			m_commandPool.destroy(m_logicalDevice.getDevice());
 
 			m_graphicsPipeline.destroy(m_logicalDevice.getDevice());
@@ -125,23 +134,23 @@ namespace gloria::core {
 
 			vkDestroyDevice(m_logicalDevice.getDevice(), nullptr);
 
-			if (m_layers->isEnabled())
+			if (m_layers.isEnabled()) {
 				DestroyDebugUtilsMessengerEXT(m_vkInstance, m_debugMessenger, nullptr);
+			}
 
 			m_surface.destroy(m_vkInstance);
+
 			vkDestroyInstance(m_vkInstance, nullptr);
 
 			glfwDestroyWindow(m_window.get()->getWindowPtr());
 
 			glfwTerminate();
 
-			delete m_layers;
+			m_window.reset();
 		}
 
 		void createVulkanInstance() {
-			m_layers = new ValidationLayer();
-
-			if (m_layers->isEnabled() && !m_layers->checkValidationLayerSupport()) {
+			if (m_layers.isEnabled() && !m_layers.checkValidationLayerSupport()) {
 				throw std::runtime_error("Validation layers requested, but not available!").what();
 			}
 
@@ -158,12 +167,12 @@ namespace gloria::core {
 			createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 			createInfo.pApplicationInfo = &appInfo;
 
-			auto extensions = m_layers->getRequiredExtensions();
+			auto extensions = m_layers.getRequiredExtensions();
 			createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
 			createInfo.ppEnabledExtensionNames = extensions.data();
 
 			VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
-			if (m_layers->isEnabled()) {
+			if (m_layers.isEnabled()) {
 				createInfo.enabledLayerCount = static_cast<uint32_t>(g_validationLayers.size());
 				createInfo.ppEnabledLayerNames = g_validationLayers.data();
 
@@ -176,7 +185,7 @@ namespace gloria::core {
 				createInfo.pNext = nullptr;
 			}
 
-			VK_VALIDATE(vkCreateInstance(&createInfo, nullptr, &m_vkInstance) != VK_SUCCESS, "Failed to create a Vulkan instance!");
+			VK_VALIDATE(vkCreateInstance(&createInfo, nullptr, &m_vkInstance), "Failed to create a Vulkan instance!");
 		}
 
 		void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
@@ -188,18 +197,19 @@ namespace gloria::core {
 		}
 
 		void setupDebugMessenger() {
-			if (!m_layers->isEnabled()) return;
+			if (!m_layers.isEnabled()) return;
 
 			VkDebugUtilsMessengerCreateInfoEXT createInfo;
 			populateDebugMessengerCreateInfo(createInfo);
 
-			VK_VALIDATE(CreateDebugUtilsMessengerEXT(m_vkInstance, &createInfo, nullptr, &m_debugMessenger) != VK_SUCCESS, "Failed to set up debug messenger!");
+			VK_VALIDATE(CreateDebugUtilsMessengerEXT(m_vkInstance, &createInfo, nullptr, &m_debugMessenger), "Failed to set up debug messenger!");
 		}
+
 	private:
 		std::unique_ptr<Window> m_window;
 		VkInstance m_vkInstance;
 		VkDebugUtilsMessengerEXT m_debugMessenger;
-		ValidationLayer* m_layers;
+		ValidationLayer m_layers;
 		WindowSurface m_surface;
 		PhysicalDevice m_physicalDevice;
 		LogicalDevice m_logicalDevice;
@@ -207,5 +217,6 @@ namespace gloria::core {
 		GraphicsPipeline m_graphicsPipeline;
 		CommandPool m_commandPool;
 		CommandBuffer m_commandBuffer;
+		VulkanRenderer m_renderer;
 	};
 }

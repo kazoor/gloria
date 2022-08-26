@@ -23,6 +23,7 @@ namespace gloria::core {
 		}
 
 		void destroy(VkDevice device);
+
 	private:
 		VkViewport m_viewport;
 		VkPipelineLayout m_pipelineLayout;

@@ -43,15 +43,15 @@ namespace gloria::core {
 			return m_graphicsFamily.has_value() && m_presentFamily.has_value();
 		}
 
-		std::optional<std::uint32_t> getGraphicsFamily() {
+		/*std::optional<std::uint32_t> getGraphicsFamily()& {
 			return m_graphicsFamily;
 		}
 
-		std::optional<std::uint32_t> getPresentFamily() {
+		std::optional<std::uint32_t> getPresentFamily()& {
 			return m_presentFamily;
-		}
+		}*/
 
-	private:
+	public:
 		std::optional<std::uint32_t> m_graphicsFamily;
 		std::optional<std::uint32_t> m_presentFamily;
 	};
