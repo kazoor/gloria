@@ -9,6 +9,12 @@ set(SRC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_library(engine STATIC
     "${SRC}/core/application/application.cpp"
+    "${SRC}/core/instance/instance.cpp"
+    "${SRC}/core/window/window.cpp"
+    "${SRC}/utils/log/log.cpp"
+    "${SRC}/defines.hpp"
+
+    "${SRC}/vulkan/vulkaninstance/vulkaninstance.cpp"
     # "${CMAKE_CURRENT_SOURCE_DIR}/include/gloria.hpp"
 )
 
@@ -36,6 +42,7 @@ else()
     message(STATUS "Using vulkan lib at ${Vulkan_LIBRARIES}")
 endif()
 
+include_directories("${Vulkan_INCLUDE_DIRS}")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/glm/")
 
 message(STATUS "Compiling GLFW")
