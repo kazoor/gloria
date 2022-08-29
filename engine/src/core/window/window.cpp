@@ -13,27 +13,27 @@ namespace gloria::core {
 	static float lastFrame = 0.0f;
 
 	void windowSizeCallback(GLFWwindow* window, int width, int height) {
-		EVentHandler::emit(WindowResizeEvent(width, height));
+		EventHandler::emit(WindowResizeEvent(width, height));
 	}
 
 	void windowShouldCloseCallback(GLFWwindow* window) {
-
+		EventHandler::emit(WindowShouldCloseEvent(true));
 	}
 
 	void windowFrameBufferSizeCallback(GLFWwindow* window, int width, int height) {
-
+		EventHandler::emit(WindowFrameBufferResizeEvent(width, height));
 	}
 
 	void windowPositionCallback(GLFWwindow* window, int xpos, int ypos) {
-
+		EventHandler::emit(WindowPositionEvent(xpos, ypos));
 	}
 
 	void windowContentScaleCallback(GLFWwindow* window, float xscale, float yscale) {
-
+		EventHandler::emit(WindowContentScaleEvent(xscale, yscale));
 	}
 
 	void windowFocusCallback(GLFWwindow* window, int focused) {
-
+		EventHandler::emit(WindowFocusEvent(focused));
 	}
 
 	Window::Window() {

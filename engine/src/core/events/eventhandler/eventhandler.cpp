@@ -4,5 +4,5 @@
 #include <vector>
 
 namespace gloria::core {
-	EventMap EVentHandler::eventMap;
+	EventMap EventHandler::eventMap;
 }

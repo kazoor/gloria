@@ -10,14 +10,14 @@ namespace gloria::core {
 	typedef std::multimap<const std::type_info*,
 		const std::function<void(const Event&)>> EventMap;
 
-	class EVentHandler {
+	class EventHandler {
 	private:
 		static EventMap eventMap;
 
 	public:
 		template<typename EventWanted>
 		static void on(const std::function<void(const Event&)>& fn) {
-			EVentHandler::eventMap.emplace(&typeid(EventWanted), fn);
+			EventHandler::eventMap.emplace(&typeid(EventWanted), fn);
 		}
 
 		static void emit(const Event& event) {

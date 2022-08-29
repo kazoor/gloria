@@ -3,6 +3,8 @@
 #include "../../utils/base.hpp"
 #include "../../defines.hpp"
 #include "../window/window.hpp"
+#include "../../utils/input/input.hpp"
+#include "../../utils/input/inputhandler/inputhandler.hpp"
 
 namespace gloria::core {
     class Instance;
@@ -14,6 +16,7 @@ namespace gloria::core {
         Instance() {
             instanceClassPtr = this;
             mWindow = std::make_shared<Window>();
+            gInputInstance = std::make_shared<util::InputHandler>();
         }
 
         ~Instance() {

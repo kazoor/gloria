@@ -14,6 +14,7 @@ add_library(engine STATIC
     "${SRC}/core/layers/layerstack/layerstack.cpp"
     "${SRC}/core/window/window.cpp"
     "${SRC}/utils/log/log.cpp"
+    "${SRC}/utils/input/inputhandler/inputhandler.cpp"
     "${SRC}/defines.hpp"
     "${SRC}/vulkan/vulkaninstance/vulkaninstance.cpp"
 )

@@ -7,6 +7,9 @@
 #include "../instance/instance.hpp"
 #include "../events/events.hpp"
 #include "../events/eventhandler/eventhandler.hpp"
+#include "../../utils/input/input.hpp"
+#include "../../utils/input/inputhandler/inputhandler.hpp"
+#include "../../utils/input/keycodes.hpp"
 
 namespace gloria::core {
 	Application::Application() {
@@ -45,9 +48,14 @@ namespace gloria::core {
 	}
 
 	void Application::onEvent() {
-		EVentHandler::on<WindowResizeEvent>([](const Event& e) {
+		EventHandler::on<WindowResizeEvent>([](const Event& e) {
 			auto event = static_cast<const WindowResizeEvent&>(e);
 			GL_CORE_INFO("Window resize event triggered! new size: {0}x{1}", event.w, event.h);
+		});
+
+		EventHandler::on<WindowFocusEvent>([](const Event& e) {
+			auto event = static_cast<const WindowFocusEvent&>(e);
+			GL_CORE_INFO("Focus event triggered! focus: {0}", event.focus);
 		});
 	}
 
