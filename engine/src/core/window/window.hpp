@@ -3,20 +3,11 @@
 #include <GLFW/glfw3.h>
 #include <string>
 #include <tuple>
+#include "../../utils/base.hpp"
+#include "../../utils/time/time.hpp"
+#include "../layers/layerstack/layerstack.hpp"
 
 namespace gloria::core {
-	struct GlWindowInfo_t {
-		std::tuple<int, int> windowSize;
-		std::tuple<int, int> frameBufferSize;
-		std::tuple<int, int> windowPos;
-		std::tuple<float, float> contentScale;
-		std::string title;
-		bool focused;
-		bool resized;
-		bool shouldClose;
-		GLFWwindow* ctx;
-	};
-
 	class Window
 	{
 	public:
@@ -30,18 +21,24 @@ namespace gloria::core {
 
 		GLFWwindow* createWindowPtr(int width, int height, const std::string& title);
 
-		void pollEvents();
-
-		GLFWwindow* getWindow();
-
+		void update();
+		
 		void destroy();
 
-		GlWindowInfo_t getWindowInfo();
+		void pushLayer(Shared<Layer> layer);
+
+		void pushOverlay(Shared<Layer> overlay);
+
+		GLFWwindow* getRawWindow();
 
 		void setTitle(const std::string& title);
+
+		bool isValid();
+
+		bool isRunning();
+
 	private:
 		GLFWwindow* mWindow{ nullptr };
-
-		GlWindowInfo_t mWindowInfo;
+		Unique<LayerStack> mLayerStack;
 	};
 }

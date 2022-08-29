@@ -1,39 +1,43 @@
 #include <iostream>
 #include <format>
 #include <string>
+#include <memory>
 #include <GLFW/glfw3.h>
 #include <gloria.hpp>
+#include <functional>
 
 using namespace gloria::core;
 
-class SandBox : public Application {
+class SandboxLayer : public Layer {
 public:
-	SandBox() {
-		mInstance = getInstance();
-		init();
+	SandboxLayer() : Layer("SandboxLayer") {
+
 	}
 
-	void init() override {
-		mInstance.getWindow().createWindow(1920, 1080, "Gloria");
-		update();
-		destroy();
+	~SandboxLayer() {
+
 	}
 
-	void update() override {
-		while (!glfwWindowShouldClose(mInstance.getWindow().getWindow())) {
-			glfwPollEvents();
-		}
+	void destroy() {
+
 	}
 
-	void destroy() override {
-		mInstance.getWindow().destroy();
+	void onUpdate(gloria::util::Time t) {
+		GL_INFO("Time: {0}", t.minutes());
 	}
+};
 
-private:
-	Instance mInstance;
+class App : public Application {
+public:
+	App() {
+		gloria::Shared<SandboxLayer> layer = std::make_shared<SandboxLayer>();
+		pushLayer(layer);
+	}
 };
 
 int main() {
-	SandBox sandBox;
+	auto app = new App();
+	app->run();
+
 	return 0;
 }

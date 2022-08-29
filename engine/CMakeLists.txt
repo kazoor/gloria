@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.7)
 project(engine)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -10,12 +10,12 @@ set(SRC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 add_library(engine STATIC
     "${SRC}/core/application/application.cpp"
     "${SRC}/core/instance/instance.cpp"
+    "${SRC}/core/events/eventhandler/eventhandler.cpp"
+    "${SRC}/core/layers/layerstack/layerstack.cpp"
     "${SRC}/core/window/window.cpp"
     "${SRC}/utils/log/log.cpp"
     "${SRC}/defines.hpp"
-
     "${SRC}/vulkan/vulkaninstance/vulkaninstance.cpp"
-    # "${CMAKE_CURRENT_SOURCE_DIR}/include/gloria.hpp"
 )
 
 set_target_properties(engine

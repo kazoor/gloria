@@ -16,6 +16,10 @@ namespace gloria::core {
             mWindow = std::make_shared<Window>();
         }
 
+        ~Instance() {
+
+        }
+
         static Instance& get() {
             return *instanceClassPtr;
         }

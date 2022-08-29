@@ -1,26 +1,29 @@
 #pragma once
 #include <vulkan/vulkan.h>
 #include <iostream>
+#include <string>
 #include "../../defines.hpp"
 #include "../../utils/base.hpp"
 #include "../instance/instance.hpp"
+#include "../layers/layer/layer.hpp"
 
 namespace gloria::core {
 	class Application {
 	public:
 		Application();
 
+		Application(const std::string &title);
+
 		virtual ~Application();
 
-		virtual void init();
+		void pushLayer(Shared<Layer> layer);
 
-		virtual void update();
+		void pushOverlay(Shared<Layer> layer);
 
-		virtual void destroy();
+		void run();
 
-		Instance& getInstance();
+		// virtual void applyLayers(void* ctx) = 0;
 
-	private:
-		Shared<Instance> applicationInstance;
+		Window& getWindow();
 	};
 }

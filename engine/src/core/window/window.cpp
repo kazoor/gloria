@@ -1,49 +1,49 @@
 #include "window.hpp"
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
+#include <memory>
+#include "../../defines.hpp"
+#include "../../utils/base.hpp"
+#include "../../utils/time/time.hpp"
+#include "../instance/instance.hpp"
 
 namespace gloria::core {
+	static float lastFrame = 0.0f;
+
 	void windowSizeCallback(GLFWwindow* window, int width, int height) {
-		GlWindowInfo_t& windowInfo = *reinterpret_cast<GlWindowInfo_t*>(glfwGetWindowUserPointer(window));
-		windowInfo.windowSize = { width, height };
-		windowInfo.resized = true; // this doesnt get reset atm
+
 	}
 
 	void windowShouldCloseCallback(GLFWwindow* window) {
-		GlWindowInfo_t& windowInfo = *reinterpret_cast<GlWindowInfo_t*>(glfwGetWindowUserPointer(window));
-		windowInfo.shouldClose = true;
+
 	}
 
 	void windowFrameBufferSizeCallback(GLFWwindow* window, int width, int height) {
-		GlWindowInfo_t& windowInfo = *reinterpret_cast<GlWindowInfo_t*>(glfwGetWindowUserPointer(window));
-		windowInfo.frameBufferSize = { width, height };
+
 	}
 
 	void windowPositionCallback(GLFWwindow* window, int xpos, int ypos) {
-		GlWindowInfo_t& windowInfo = *reinterpret_cast<GlWindowInfo_t*>(glfwGetWindowUserPointer(window));
-		windowInfo.windowPos = { xpos, ypos };
+
 	}
 
 	void windowContentScaleCallback(GLFWwindow* window, float xscale, float yscale) {
-		GlWindowInfo_t& windowInfo = *reinterpret_cast<GlWindowInfo_t*>(glfwGetWindowUserPointer(window));
-		windowInfo.contentScale = { xscale, yscale };
+
 	}
 
 	void windowFocusCallback(GLFWwindow* window, int focused) {
-		GlWindowInfo_t& windowInfo = *reinterpret_cast<GlWindowInfo_t*>(glfwGetWindowUserPointer(window));
-			windowInfo.focused = static_cast<bool>(focused);
+
 	}
 
 	Window::Window() {
-
+		mLayerStack = std::make_unique<LayerStack>();
 	}
 
 	Window::Window(int width, int height, const std::string& title) {
 		mWindow = createWindowPtr(width, height, title);
+		mLayerStack = std::make_unique<LayerStack>();
 	}
 
 	Window::~Window() {
-
 	}
 
 	void Window::createWindow(int width, int height, const std::string& title) {
@@ -54,20 +54,14 @@ namespace gloria::core {
 
 		mWindow = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 
+#ifdef DEBUG
+		if (isValid())
+			GL_CORE_INFO("Window created");
+		else
+			GL_CORE_ERROR("Failed to create window");
+#endif // DEBUG
+
 		glfwSetWindowSizeCallback(mWindow, windowSizeCallback);
-
-		GlWindowInfo_t info = {
-			.windowSize = {width, height},
-			.title = title,
-			.focused = true,
-			.resized = false,
-			.shouldClose = false,
-			.ctx = mWindow
-		};
-
-		mWindowInfo = info;
-
-		glfwSetWindowUserPointer(mWindow, &mWindowInfo);
 
 		// callbacks
 		glfwSetWindowSizeCallback(mWindow, windowSizeCallback);
@@ -91,18 +85,12 @@ namespace gloria::core {
 
 		auto window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 
-		GlWindowInfo_t info = {
-			.windowSize = {width, height},
-			.title = title,
-			.focused = true,
-			.resized = false,
-			.shouldClose = false,
-			.ctx = window
-		};
-
-		mWindowInfo = info;
-
-		glfwSetWindowUserPointer(window, &mWindowInfo);
+#ifdef DEBUG
+		if (isValid())
+			GL_CORE_INFO("Window created");
+		else
+			GL_CORE_ERROR("Failed to create window");
+#endif // DEBUG
 
 		// callbacks
 		glfwSetWindowSizeCallback(window, windowSizeCallback);
@@ -120,13 +108,19 @@ namespace gloria::core {
 		return window;
 	}
 
-	void Window::pollEvents() {
-		while (!glfwWindowShouldClose(mWindow)) {
-			glfwPollEvents();
+	void Window::update() {
+		float currentFrame = static_cast<float>(glfwGetTime());
+		util::Time t = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
+		for (auto& layer : *mLayerStack) {
+			layer->onUpdate(t);
 		}
+
+		glfwPollEvents();
 	}
 
-	GLFWwindow* Window::getWindow() {
+	GLFWwindow* Window::getRawWindow() {
 		return mWindow;
 	}
 
@@ -136,12 +130,25 @@ namespace gloria::core {
 		glfwTerminate();
 	}
 
-	GlWindowInfo_t Window::getWindowInfo() {
-		return mWindowInfo;
+	void Window::pushLayer(Shared<Layer> layer)
+	{
+		mLayerStack.get()->pushLayer(layer);
+	}
+
+	void Window::pushOverlay(Shared<Layer> overlay)
+	{
+		mLayerStack.get()->pushOverlay(overlay);
 	}
 
 	void Window::setTitle(const std::string& title) {
 		glfwSetWindowTitle(mWindow, title.c_str());
-		mWindowInfo.title = title;
+	}
+
+	bool Window::isValid() {
+		return mWindow != nullptr;
+	}
+
+	bool Window::isRunning() {
+		return !glfwWindowShouldClose(mWindow);
 	}
 }

@@ -3,7 +3,7 @@ project(gloria)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-#add_compile_definitions(DEBUG)
+add_compile_definitions(DEBUG)
 add_compile_definitions(GLORIA_PLATFORM_WINDOWS)
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/engine")
