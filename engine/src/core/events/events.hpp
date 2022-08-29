@@ -1,19 +1,16 @@
 #pragma once
 
 namespace gloria::core {
+
 	struct Event {
+		virtual ~Event() {}
+	};
+
+	struct WindowResizeEvent : public Event {
 	public:
-		enum class EventType {
-			base, // initial
+		WindowResizeEvent(int width, int height) : w(width), h(height) {}
 
-			// window events
-			windowClose,
-			windowResize,
-			windowFocus,
-		};
-
-		EventType type = EventType::base;
-
-		Event(EventType type) : type(type) {}
+		int w{ 0 };
+		int h{ 0 };
 	};
 }

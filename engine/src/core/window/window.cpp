@@ -6,12 +6,14 @@
 #include "../../utils/base.hpp"
 #include "../../utils/time/time.hpp"
 #include "../instance/instance.hpp"
+#include "../events/events.hpp"
+#include "../events/eventhandler/eventhandler.hpp"
 
 namespace gloria::core {
 	static float lastFrame = 0.0f;
 
 	void windowSizeCallback(GLFWwindow* window, int width, int height) {
-
+		EVentHandler::emit(WindowResizeEvent(width, height));
 	}
 
 	void windowShouldCloseCallback(GLFWwindow* window) {

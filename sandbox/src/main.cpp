@@ -5,8 +5,11 @@
 #include <GLFW/glfw3.h>
 #include <gloria.hpp>
 #include <functional>
+#include <map>
+#include <typeinfo>
 
 using namespace gloria::core;
+
 
 class SandboxLayer : public Layer {
 public:
@@ -15,15 +18,12 @@ public:
 	}
 
 	~SandboxLayer() {
-
 	}
 
 	void destroy() {
-
 	}
 
 	void onUpdate(gloria::util::Time t) {
-		GL_INFO("Time: {0}", t.minutes());
 	}
 };
 

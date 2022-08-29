@@ -22,6 +22,8 @@ namespace gloria::core {
 
 		void run();
 
+		void onEvent();
+
 		// virtual void applyLayers(void* ctx) = 0;
 
 		Window& getWindow();

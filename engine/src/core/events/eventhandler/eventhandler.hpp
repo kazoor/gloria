@@ -2,21 +2,28 @@
 #include <iostream>
 #include <functional>
 #include <vector>
+#include <iterator>
+#include <map>
+#include "../events.hpp"
 
 namespace gloria::core {
-	class EventHandler
-	{
-	public:
+	typedef std::multimap<const std::type_info*,
+		const std::function<void(const Event&)>> EventMap;
 
-		template <typename T>
-		static void AddListener(std::function<void(T&)> callback);
-
-		template <typename T>
-		static void TriggerEvent(T& event);
-
+	class EVentHandler {
 	private:
+		static EventMap eventMap;
 
-		template <typename T>
-		static std::vector<std::function<void(T&)>>& getListeners();
+	public:
+		template<typename EventWanted>
+		static void on(const std::function<void(const Event&)>& fn) {
+			EVentHandler::eventMap.emplace(&typeid(EventWanted), fn);
+		}
+
+		static void emit(const Event& event) {
+			auto range = eventMap.equal_range(&typeid(event));
+			for (auto it = range.first; it != range.second; ++it)
+				it->second(event);
+		}
 	};
 }

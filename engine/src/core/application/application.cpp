@@ -5,18 +5,22 @@
 #include "../../utils/log/log.hpp"
 #include "../../utils/base.hpp"
 #include "../instance/instance.hpp"
+#include "../events/events.hpp"
+#include "../events/eventhandler/eventhandler.hpp"
 
 namespace gloria::core {
 	Application::Application() {
 		gInstance = std::make_shared<Instance>();
 		Log::Init();
 		Instance::get().getWindow().createWindow(1920, 1080, "App");
+		onEvent();
 	}
 
 	Application::Application(const std::string& title) {
 		gInstance = std::make_shared<Instance>();
 		Log::Init();
 		Instance::get().getWindow().createWindow(1920, 1080, title);
+		onEvent();
 	}
 
 	Application::~Application() {
@@ -38,6 +42,13 @@ namespace gloria::core {
 		while (Instance::get().getWindow().isRunning()) {
 			Instance::get().getWindow().update();
 		}
+	}
+
+	void Application::onEvent() {
+		EVentHandler::on<WindowResizeEvent>([](const Event& e) {
+			auto event = static_cast<const WindowResizeEvent&>(e);
+			GL_CORE_INFO("Window resize event triggered! new size: {0}x{1}", event.w, event.h);
+		});
 	}
 
 	Window& Application::getWindow() {
