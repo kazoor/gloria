@@ -1,7 +1,7 @@
 #pragma once
 #include <vulkan/vulkan.h>
 #include <spdlog/spdlog.h>
-#include "utils/log/log.hpp"
+#include "utils/logger/logger.hpp"
 
 #ifdef GL_API
 #ifdef GL_EXPORT

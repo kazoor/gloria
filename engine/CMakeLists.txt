@@ -13,7 +13,7 @@ add_library(engine STATIC
     "${SRC}/core/events/eventhandler/eventhandler.cpp"
     "${SRC}/core/layers/layerstack/layerstack.cpp"
     "${SRC}/core/window/window.cpp"
-    "${SRC}/utils/log/log.cpp"
+    "${SRC}/utils/logger/logger.cpp"
     "${SRC}/utils/input/inputhandler/inputhandler.cpp"
     "${SRC}/defines.hpp"
     "${SRC}/vulkan/vulkaninstance/vulkaninstance.cpp"

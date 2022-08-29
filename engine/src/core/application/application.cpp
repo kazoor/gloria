@@ -2,7 +2,6 @@
 #include <GLFW/glfw3.h>
 #include <string>
 #include "application.hpp"
-#include "../../utils/log/log.hpp"
 #include "../../utils/base.hpp"
 #include "../instance/instance.hpp"
 #include "../events/events.hpp"
