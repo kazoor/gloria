@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_compile_definitions(DEBUG)
-# add_compile_definitions(VK_USE_VERBOSE)
+add_compile_definitions(VK_USE_VERBOSE)
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/engine")
 

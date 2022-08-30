@@ -4,10 +4,11 @@
 #include "../../utils/base.hpp"
 #include "../validationlayers/validationlayers.hpp"
 #include "../physicaldevice/physicaldevice.hpp"
+#include "../logicaldevice/logicaldevice.hpp"
+#include "../surface/surface.hpp"
 
 namespace gloria::vk {
-	class VulkanInstance
-	{
+	class VulkanInstance {
 	public:
 		VulkanInstance();
 
@@ -21,7 +22,15 @@ namespace gloria::vk {
 
 		void destroy();
 
-		VkInstance& getInstance();
+		VkInstance& get();
+
+		PhysicalDevice& getPhysicalDevice();
+
+		ValidationLayers& getValidationLayers();
+
+		LogicalDevice& getLogicalDevice();
+
+		Surface& getSurface();
 
 	private:
 		std::vector<const char*> getRequiredExtensions();
@@ -35,6 +44,10 @@ namespace gloria::vk {
 		Shared<ValidationLayers> mValidationLayers;
 
 		Shared<PhysicalDevice> mPhysicalDevice;
+
+		Shared<LogicalDevice> mLogicalDevice;
+
+		Shared<Surface> mSurface;
 
 		VkDebugUtilsMessengerEXT mDebugMessenger;
 	};

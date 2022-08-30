@@ -21,6 +21,13 @@ namespace gloria::vk {
 				indices.graphicsFamily = i;
 			}
 
+			VkBool32 presentSupport = false;
+			vkGetPhysicalDeviceSurfaceSupportKHR(device, i, core::Instance::get().getVkInstance().getSurface().get(), &presentSupport);
+
+			if (presentSupport) {
+				indices.presentFamily = i;
+			}
+
 			if (indices.isComplete()) {
 				break;
 			}
@@ -37,16 +44,20 @@ namespace gloria::vk {
 	PhysicalDevice::~PhysicalDevice() {
 	}
 
+	void PhysicalDevice::init() {
+		SelectPhysicalDevice();
+	}
+
 	void PhysicalDevice::SelectPhysicalDevice() {
 		std::uint32_t deviceCount = 0;
-		vkEnumeratePhysicalDevices(core::Instance::get().getVkInstance().getInstance(), &deviceCount, nullptr);
+		vkEnumeratePhysicalDevices(core::Instance::get().getVkInstance().get(), &deviceCount, nullptr);
 
 		if (deviceCount == 0) {
 			throw std::runtime_error("Failed to find GPU's with Vulkan support!");
 		}
 
 		std::vector<VkPhysicalDevice> devices(deviceCount);
-		vkEnumeratePhysicalDevices(core::Instance::get().getVkInstance().getInstance(), &deviceCount, devices.data());
+		vkEnumeratePhysicalDevices(core::Instance::get().getVkInstance().get(), &deviceCount, devices.data());
 
 		// rate all the devices found
 		std::map<int, VkPhysicalDevice> candidateDevices;
@@ -85,7 +96,7 @@ namespace gloria::vk {
 		mGpuInfo = gpuInfo;
 	}
 
-	VkPhysicalDevice& PhysicalDevice::getPhysicalDevice() {
+	VkPhysicalDevice& PhysicalDevice::get() {
 		return mPhysicalDevice;
 	}
 

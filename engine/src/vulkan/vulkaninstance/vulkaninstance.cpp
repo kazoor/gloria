@@ -5,11 +5,14 @@
 #include "../../defines.hpp"
 #include "../validationlayers/validationlayers.hpp"
 #include "../physicaldevice/physicaldevice.hpp"
+#include "../logicaldevice/logicaldevice.hpp"
 
 namespace gloria::vk {
 	VulkanInstance::VulkanInstance() {
 		mValidationLayers = std::make_shared<ValidationLayers>();
 		mPhysicalDevice = std::make_shared<PhysicalDevice>();
+		mLogicalDevice = std::make_shared<LogicalDevice>();
+		mSurface = std::make_shared<Surface>();
 	}
 
 	VulkanInstance::~VulkanInstance() {
@@ -19,12 +22,17 @@ namespace gloria::vk {
 		createInstance();
 
 		setupDebugMessenger();
-		mPhysicalDevice.get()->SelectPhysicalDevice();
+
+		mSurface.get()->init();
+
+		mPhysicalDevice.get()->init(); // selects the best suitable GPU to render with.
 
 #ifdef DEBUG
 		auto& gpuInfo = mPhysicalDevice.get()->getGpuInfo();
 		GL_CORE_INFO("GPU selected: {0}(Driver version: {1}, API Version: {2}), Score during device selection: {3}", gpuInfo.deviceName, gpuInfo.driverVersion, gpuInfo.apiVersion, gpuInfo.score);
 #endif // DEBUG
+
+		mLogicalDevice.get()->init();
 	}
 
 	void VulkanInstance::createInstance() {
@@ -76,15 +84,34 @@ namespace gloria::vk {
 	}
 
 	void VulkanInstance::destroy() {
+		mLogicalDevice.get()->init();
+
 		if (mValidationLayers.get()->isEnabled()) {
 			mValidationLayers.get()->DestroyDebugUtilsMessengerEXT(mVkInstance, mDebugMessenger, nullptr);
 		}
 
+		mSurface.get()->destroy();
 		vkDestroyInstance(mVkInstance, nullptr);
 	}
 
-	VkInstance& VulkanInstance::getInstance() {
+	VkInstance& VulkanInstance::get() {
 		return mVkInstance;
+	}
+
+	PhysicalDevice& VulkanInstance::getPhysicalDevice() {
+		return *mPhysicalDevice;
+	}
+
+	ValidationLayers& VulkanInstance::getValidationLayers() {
+		return *mValidationLayers;
+	}
+
+	LogicalDevice& VulkanInstance::getLogicalDevice() {
+		return *mLogicalDevice;
+	}
+
+	Surface& VulkanInstance::getSurface() {
+		return *mSurface;
 	}
 
 	std::vector<const char*> VulkanInstance::getRequiredExtensions() {

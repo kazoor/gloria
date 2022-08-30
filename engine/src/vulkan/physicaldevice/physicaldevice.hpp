@@ -6,9 +6,10 @@
 namespace gloria::vk {
 	struct QueueFamilyIndices {
 		std::optional<std::uint32_t> graphicsFamily;
+		std::optional<std::uint32_t> presentFamily;
 
 		bool isComplete() {
-			return graphicsFamily.has_value();
+			return graphicsFamily.has_value() && presentFamily.has_value();
 		}
 	};
 
@@ -35,9 +36,11 @@ namespace gloria::vk {
 
 		~PhysicalDevice();
 
+		void init();
+
 		void SelectPhysicalDevice();
 
-		VkPhysicalDevice& getPhysicalDevice();
+		VkPhysicalDevice& get();
 
 		GpuInfo& getGpuInfo();
 

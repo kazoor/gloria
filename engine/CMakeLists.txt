@@ -19,6 +19,8 @@ add_library(engine STATIC
     "${SRC}/vulkan/vulkaninstance/vulkaninstance.cpp"
     "${SRC}/vulkan/validationlayers/validationlayers.cpp"
     "${SRC}/vulkan/physicaldevice/physicaldevice.cpp"
+    "${SRC}/vulkan/logicaldevice/logicaldevice.cpp"
+    "${SRC}/vulkan/surface/surface.cpp"
 )
 
 set_target_properties(engine
