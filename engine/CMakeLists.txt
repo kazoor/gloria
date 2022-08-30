@@ -17,6 +17,7 @@ add_library(engine STATIC
     "${SRC}/utils/input/inputhandler/inputhandler.cpp"
     "${SRC}/defines.hpp"
     "${SRC}/vulkan/vulkaninstance/vulkaninstance.cpp"
+    "${SRC}/vulkan/validationlayers/validationlayers.cpp"
 )
 
 set_target_properties(engine

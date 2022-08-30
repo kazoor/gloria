@@ -119,6 +119,8 @@ namespace gloria::core {
 			layer->onUpdate(t);
 		}
 
+		Instance::get().getVkInstance().run();
+
 		glfwPollEvents();
 	}
 
@@ -127,18 +129,18 @@ namespace gloria::core {
 	}
 
 	void Window::destroy() {
+		Instance::get().getVkInstance().destroy();
+
 		glfwDestroyWindow(mWindow);
 
 		glfwTerminate();
 	}
 
-	void Window::pushLayer(Shared<Layer> layer)
-	{
+	void Window::pushLayer(Shared<Layer> layer) {
 		mLayerStack.get()->pushLayer(layer);
 	}
 
-	void Window::pushOverlay(Shared<Layer> overlay)
-	{
+	void Window::pushOverlay(Shared<Layer> overlay) {
 		mLayerStack.get()->pushOverlay(overlay);
 	}
 

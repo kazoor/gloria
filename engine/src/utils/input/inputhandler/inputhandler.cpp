@@ -7,63 +7,63 @@
 double m_ScrollX = 0.0;
 double m_ScrollY = 0.0;
 
-namespace gloria::util {    
-    bool InputHandler::isKeyPressedImpl(int KeyCode) {
-        auto State = glfwGetKey(core::Instance::get().getWindow().getRawWindow(), KeyCode);
+namespace gloria::util {
+	bool InputHandler::isKeyPressedImpl(int KeyCode) {
+		auto State = glfwGetKey(core::Instance::get().getWindow().getRawWindow(), KeyCode);
 
-        return State == GLFW_PRESS || State == GLFW_REPEAT;
-    }
+		return State == GLFW_PRESS || State == GLFW_REPEAT;
+	}
 
-    bool InputHandler::isMouseKeyPressedImpl(int KeyCode) {
-        auto State = glfwGetMouseButton(core::Instance::get().getWindow().getRawWindow(), KeyCode);
+	bool InputHandler::isMouseKeyPressedImpl(int KeyCode) {
+		auto State = glfwGetMouseButton(core::Instance::get().getWindow().getRawWindow(), KeyCode);
 
-        return State == GLFW_PRESS;
-    }
+		return State == GLFW_PRESS;
+	}
 
-    std::pair<double, double> InputHandler::getMousePositionImpl() {
-        double X, Y;
-        glfwGetCursorPos(core::Instance::get().getWindow().getRawWindow(), &X, &Y);
+	std::pair<double, double> InputHandler::getMousePositionImpl() {
+		double X, Y;
+		glfwGetCursorPos(core::Instance::get().getWindow().getRawWindow(), &X, &Y);
 
-        return {X, Y};
-    }
+		return { X, Y };
+	}
 
-    double InputHandler::getMouseXImpl() {
-        auto[X, Y] = getMousePositionImpl();
+	double InputHandler::getMouseXImpl() {
+		auto [X, Y] = getMousePositionImpl();
 
-        return X;
-    }
+		return X;
+	}
 
-    double InputHandler::getMouseYImpl() {
-        auto[X, Y] = getMousePositionImpl();
+	double InputHandler::getMouseYImpl() {
+		auto [X, Y] = getMousePositionImpl();
 
-        return Y;
-    }
+		return Y;
+	}
 
-    double InputHandler::getScrollXImpl() {
-        auto[X, Y] = getScrollInputImpl();
+	double InputHandler::getScrollXImpl() {
+		auto [X, Y] = getScrollInputImpl();
 
-        return X;
-    }
+		return X;
+	}
 
-    double InputHandler::getScrollYImpl() {
-        auto[X, Y] = getScrollInputImpl();
+	double InputHandler::getScrollYImpl() {
+		auto [X, Y] = getScrollInputImpl();
 
-        return Y;
-    }
+		return Y;
+	}
 
-    void InputHandler::resetScrollImpl() { // Reset each frame.
-        m_ScrollY = 0.0;
-        m_ScrollY = 0.0;
-    }
+	void InputHandler::resetScrollImpl() { // Reset each frame.
+		m_ScrollY = 0.0;
+		m_ScrollY = 0.0;
+	}
 
-    void scrollCallback(GLFWwindow* wnd, double offsetx, double offsety) {
-        m_ScrollX = offsetx;
-        m_ScrollY = offsety;
-        GL_CORE_INFO("Detected scroll: {0}, {1}", offsetx, offsety);
-    }
+	void scrollCallback(GLFWwindow* wnd, double offsetx, double offsety) {
+		m_ScrollX = offsetx;
+		m_ScrollY = offsety;
+		GL_CORE_INFO("Detected scroll: {0}, {1}", offsetx, offsety);
+	}
 
-    std::pair<double, double> InputHandler::getScrollInputImpl() {
-        glfwSetScrollCallback(core::Instance::get().getWindow().getRawWindow(), scrollCallback);
-        return { m_ScrollX, m_ScrollY };
-    }
+	std::pair<double, double> InputHandler::getScrollInputImpl() {
+		glfwSetScrollCallback(core::Instance::get().getWindow().getRawWindow(), scrollCallback);
+		return { m_ScrollX, m_ScrollY };
+	}
 }

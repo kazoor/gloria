@@ -4,5 +4,4 @@
 #include "../../defines.hpp"
 
 namespace gloria::core {
-
 }

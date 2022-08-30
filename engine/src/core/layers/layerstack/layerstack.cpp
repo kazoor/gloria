@@ -10,10 +10,9 @@ namespace gloria::core {
 	}
 
 	LayerStack::~LayerStack() {
-
 	}
 
-	void LayerStack::pushLayer(Shared<Layer> layer) { 
+	void LayerStack::pushLayer(Shared<Layer> layer) {
 		mLayerInsert = mLayers.emplace(mLayerInsert, layer);
 	}
 

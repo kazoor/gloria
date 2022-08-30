@@ -15,6 +15,7 @@ namespace gloria::core {
 		gInstance = std::make_shared<Instance>();
 		Log::Init();
 		Instance::get().getWindow().createWindow(1920, 1080, "App");
+		Instance::get().getVkInstance().createInstance();
 		onEvent();
 	}
 
@@ -50,12 +51,12 @@ namespace gloria::core {
 		EventHandler::on<WindowResizeEvent>([](const Event& e) {
 			auto event = static_cast<const WindowResizeEvent&>(e);
 			GL_CORE_INFO("Window resize event triggered! new size: {0}x{1}", event.w, event.h);
-		});
+			});
 
 		EventHandler::on<WindowFocusEvent>([](const Event& e) {
 			auto event = static_cast<const WindowFocusEvent&>(e);
 			GL_CORE_INFO("Focus event triggered! focus: {0}", event.focus);
-		});
+			});
 	}
 
 	Window& Application::getWindow() {
