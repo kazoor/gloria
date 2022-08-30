@@ -13,6 +13,8 @@ namespace gloria::vk {
 
 		~VulkanInstance();
 
+		void init();
+
 		void createInstance();
 
 		void run();

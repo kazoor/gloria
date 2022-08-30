@@ -15,7 +15,7 @@ namespace gloria::core {
 		gInstance = std::make_shared<Instance>();
 		Log::Init();
 		Instance::get().getWindow().createWindow(1920, 1080, "App");
-		Instance::get().getVkInstance().createInstance();
+		Instance::get().getVkInstance().init();
 		onEvent();
 	}
 

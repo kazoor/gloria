@@ -52,7 +52,7 @@ namespace gloria::core {
 		glfwInit();
 
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-		// glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 		mWindow = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 
@@ -83,7 +83,7 @@ namespace gloria::core {
 		glfwInit();
 
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-		// glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 		auto window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 

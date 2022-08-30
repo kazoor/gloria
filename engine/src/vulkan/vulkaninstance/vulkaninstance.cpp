@@ -15,6 +15,18 @@ namespace gloria::vk {
 	VulkanInstance::~VulkanInstance() {
 	}
 
+	void VulkanInstance::init() {
+		createInstance();
+
+		setupDebugMessenger();
+		mPhysicalDevice.get()->SelectPhysicalDevice();
+
+#ifdef DEBUG
+		auto& gpuInfo = mPhysicalDevice.get()->getGpuInfo();
+		GL_CORE_INFO("GPU selected: {0}(Driver version: {1}, API Version: {2}), Score during device selection: {3}", gpuInfo.deviceName, gpuInfo.driverVersion, gpuInfo.apiVersion, gpuInfo.score);
+#endif // DEBUG
+	}
+
 	void VulkanInstance::createInstance() {
 		if (mValidationLayers.get()->isEnabled() && !mValidationLayers.get()->checkValidationLayerSupport()) {
 			throw std::runtime_error("Validation layers requested, but not available");
@@ -57,14 +69,6 @@ namespace gloria::vk {
 #ifdef DEBUG
 		if (mVkInstance != VK_NULL_HANDLE)
 			GL_CORE_INFO("Vulkan instance created");
-#endif // DEBUG
-
-		setupDebugMessenger();
-		mPhysicalDevice.get()->SelectPhysicalDevice();
-
-#ifdef DEBUG
-		auto& gpuInfo = mPhysicalDevice.get()->getGpuInfo();
-		GL_CORE_INFO("GPU selected: {0}(Driver version: {1}, API Version: {2}), Score during device selection: {3}", gpuInfo.deviceName, gpuInfo.driverVersion, gpuInfo.apiVersion, gpuInfo.score);
 #endif // DEBUG
 	}
 
