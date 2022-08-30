@@ -16,6 +16,7 @@ namespace gloria::vk {
 
 	void SwapChain::init() {
 		createSwapChain();
+		createImageViews();
 	}
 
 	void SwapChain::createSwapChain() {
@@ -79,11 +80,47 @@ namespace gloria::vk {
 	}
 
 	void SwapChain::destroy() {
+		for (auto imageView : swapChainImageViews) {
+			vkDestroyImageView(core::Instance::get().getVkInstance().getLogicalDevice().get(), imageView, nullptr);
+		}
+
 		vkDestroySwapchainKHR(core::Instance::get().getVkInstance().getLogicalDevice().get(), mSwapChain, nullptr);
 	}
 
 	VkSwapchainKHR& SwapChain::get() {
 		return mSwapChain;
+	}
+
+	void SwapChain::createImageViews() {
+		swapChainImageViews.resize(swapChainImages.size());
+
+		for (std::size_t i = 0; i < swapChainImages.size(); i++) {
+			VkImageViewCreateInfo createInfo = {
+				.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+				.image = swapChainImages[i],
+				.viewType = VK_IMAGE_VIEW_TYPE_2D,
+				.format = swapChainImageFormat,
+				.components = {
+					.r = VK_COMPONENT_SWIZZLE_IDENTITY,
+					.g = VK_COMPONENT_SWIZZLE_IDENTITY,
+					.b = VK_COMPONENT_SWIZZLE_IDENTITY,
+					.a = VK_COMPONENT_SWIZZLE_IDENTITY
+				},
+				.subresourceRange = {
+					.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+					.baseMipLevel = 0,
+					.levelCount = 1,
+					.baseArrayLayer = 0,
+					.layerCount = 1
+				}
+			};
+			VK_VALIDATE(vkCreateImageView(core::Instance::get().getVkInstance().getLogicalDevice().get(), &createInfo, nullptr, &swapChainImageViews[i]), "Failed to create image views");
+
+#ifdef DEBUG
+			if (swapChainImageViews[i] != VK_NULL_HANDLE)
+				GL_CORE_INFO("Created image view");
+#endif // DEBUG
+		}
 	}
 
 	// check for our wanted surface format, if it cant be found we just return the best one.
