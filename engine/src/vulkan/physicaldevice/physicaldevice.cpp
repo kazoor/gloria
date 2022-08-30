@@ -3,6 +3,8 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <string>
+#include <set>
 #include "../../core/instance/instance.hpp"
 
 namespace gloria::vk {
@@ -132,6 +134,57 @@ namespace gloria::vk {
 			return 0;
 		}
 
+		bool extensionsSupported = checkDeviceExtensionSupport(device);
+		bool swapChainAdequate = false;
+		if (extensionsSupported) {
+			SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device);
+			swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
+
+			score += 1;
+		}
+
+		if (swapChainAdequate)
+			score += 1;
+
 		return score;
+	}
+
+	bool PhysicalDevice::checkDeviceExtensionSupport(VkPhysicalDevice device) {
+		std::uint32_t extensionCount;
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+
+		std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
+
+		std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+
+		for (const auto& extension : availableExtensions) {
+			requiredExtensions.erase(extension.extensionName);
+		}
+
+		return requiredExtensions.empty();
+	}
+
+	SwapChainSupportDetails PhysicalDevice::querySwapChainSupport(VkPhysicalDevice device) {
+		SwapChainSupportDetails details;
+
+		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, core::Instance::get().getVkInstance().getSurface().get(), &details.capabilities);
+
+		std::uint32_t formatCount;
+		vkGetPhysicalDeviceSurfaceFormatsKHR(device, core::Instance::get().getVkInstance().getSurface().get(), &formatCount, nullptr);
+
+		if (formatCount != 0) {
+			details.formats.resize(formatCount);
+			vkGetPhysicalDeviceSurfaceFormatsKHR(device, core::Instance::get().getVkInstance().getSurface().get(), &formatCount, details.formats.data());
+		}
+
+		std::uint32_t presentModeCount;
+		vkGetPhysicalDeviceSurfacePresentModesKHR(device, core::Instance::get().getVkInstance().getSurface().get(), &presentModeCount, nullptr);
+
+		if (presentModeCount != 0) {
+			details.presentModes.resize(presentModeCount);
+			vkGetPhysicalDeviceSurfacePresentModesKHR(device, core::Instance::get().getVkInstance().getSurface().get(), &presentModeCount, details.presentModes.data());
+		}
+		return details;
 	}
 }

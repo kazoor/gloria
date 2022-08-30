@@ -6,6 +6,7 @@
 #include "../physicaldevice/physicaldevice.hpp"
 #include "../logicaldevice/logicaldevice.hpp"
 #include "../surface/surface.hpp"
+#include "../swapchain/swapchain.hpp"
 
 namespace gloria::vk {
 	class VulkanInstance {
@@ -48,6 +49,8 @@ namespace gloria::vk {
 		Shared<LogicalDevice> mLogicalDevice;
 
 		Shared<Surface> mSurface;
+
+		Shared<SwapChain> mSwapchain;
 
 		VkDebugUtilsMessengerEXT mDebugMessenger;
 	};

@@ -1,9 +1,14 @@
 #pragma once
 #include <vulkan/vulkan.h>
 #include <iostream>
+#include <vector>
 #include <optional>
 
 namespace gloria::vk {
+	const std::vector<const char*> deviceExtensions = {
+		VK_KHR_SWAPCHAIN_EXTENSION_NAME
+	};
+
 	struct QueueFamilyIndices {
 		std::optional<std::uint32_t> graphicsFamily;
 		std::optional<std::uint32_t> presentFamily;
@@ -14,6 +19,12 @@ namespace gloria::vk {
 	};
 
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
+
+	struct SwapChainSupportDetails {
+		VkSurfaceCapabilitiesKHR capabilities;
+		std::vector<VkSurfaceFormatKHR> formats;
+		std::vector<VkPresentModeKHR> presentModes;
+	};
 
 	// struct used to parse GPU info from the chosen physical device.
 	// based on VkPhysicalDeviceProperties
@@ -44,9 +55,14 @@ namespace gloria::vk {
 
 		GpuInfo& getGpuInfo();
 
+
+		SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
+
 	private:
 		// rates all GPU's available by a score and selects the best one
 		int rateDevice(VkPhysicalDevice device);
+
+		bool checkDeviceExtensionSupport(VkPhysicalDevice device);
 
 		VkPhysicalDevice mPhysicalDevice{ VK_NULL_HANDLE };
 

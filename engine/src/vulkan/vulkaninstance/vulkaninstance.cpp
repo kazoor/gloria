@@ -6,6 +6,7 @@
 #include "../validationlayers/validationlayers.hpp"
 #include "../physicaldevice/physicaldevice.hpp"
 #include "../logicaldevice/logicaldevice.hpp"
+#include "../swapchain/swapchain.hpp"
 
 namespace gloria::vk {
 	VulkanInstance::VulkanInstance() {
@@ -13,6 +14,7 @@ namespace gloria::vk {
 		mPhysicalDevice = std::make_shared<PhysicalDevice>();
 		mLogicalDevice = std::make_shared<LogicalDevice>();
 		mSurface = std::make_shared<Surface>();
+		mSwapchain = std::make_shared<SwapChain>();
 	}
 
 	VulkanInstance::~VulkanInstance() {
@@ -33,6 +35,8 @@ namespace gloria::vk {
 #endif // DEBUG
 
 		mLogicalDevice.get()->init();
+
+		mSwapchain.get()->init();
 	}
 
 	void VulkanInstance::createInstance() {
@@ -84,6 +88,8 @@ namespace gloria::vk {
 	}
 
 	void VulkanInstance::destroy() {
+		mSwapchain.get()->destroy();
+
 		mLogicalDevice.get()->init();
 
 		if (mValidationLayers.get()->isEnabled()) {

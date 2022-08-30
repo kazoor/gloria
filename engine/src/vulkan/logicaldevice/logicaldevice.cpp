@@ -23,7 +23,6 @@ namespace gloria::vk {
 		std::set<std::uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
 		float queuePrio = 1.0f;
 
-
 		for (std::uint32_t queueFamily : uniqueQueueFamilies) {
 			VkDeviceQueueCreateInfo queueCreateInfo = {
 				.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
@@ -41,9 +40,11 @@ namespace gloria::vk {
 			.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
 			.queueCreateInfoCount = static_cast<std::uint32_t>(queueCreateInfos.size()),
 			.pQueueCreateInfos = queueCreateInfos.data(),
-			.enabledExtensionCount = 0,
 			.pEnabledFeatures = &deviceFeatures,
 		};
+
+		createInfo.enabledExtensionCount = static_cast<std::uint32_t>(deviceExtensions.size());
+		createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
 		if (core::Instance::get().getVkInstance().getValidationLayers().isEnabled()) {
 			createInfo.enabledLayerCount = static_cast<std::uint32_t>(core::Instance::get().getVkInstance().getValidationLayers().validationLayers.size());

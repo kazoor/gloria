@@ -21,6 +21,7 @@ add_library(engine STATIC
     "${SRC}/vulkan/physicaldevice/physicaldevice.cpp"
     "${SRC}/vulkan/logicaldevice/logicaldevice.cpp"
     "${SRC}/vulkan/surface/surface.cpp"
+    "${SRC}/vulkan/swapchain/swapchain.cpp"
 )
 
 set_target_properties(engine
