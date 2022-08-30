@@ -35,7 +35,6 @@ namespace gloria::vk {
 	}
 
 	PhysicalDevice::~PhysicalDevice() {
-
 	}
 
 	void PhysicalDevice::SelectPhysicalDevice() {
@@ -51,8 +50,9 @@ namespace gloria::vk {
 
 		// rate all the devices found
 		std::map<int, VkPhysicalDevice> candidateDevices;
+		int score = 0;
 		for (const auto& device : devices) {
-			int score = rateDevice(device);
+			score = rateDevice(device);
 			candidateDevices.insert(std::make_pair(score, device));
 		}
 
@@ -63,7 +63,6 @@ namespace gloria::vk {
 		else {
 			throw std::runtime_error("Failed to find a suitable GPU");
 		}
-
 
 		VkPhysicalDeviceProperties deviceProperties;
 		vkGetPhysicalDeviceProperties(mPhysicalDevice, &deviceProperties);
@@ -80,6 +79,7 @@ namespace gloria::vk {
 			.pipelineCacheUUID = deviceProperties.pipelineCacheUUID,
 			.limits = deviceProperties.limits,
 			.sparseProperties = deviceProperties.sparseProperties,
+			.score = score
 		};
 
 		mGpuInfo = gpuInfo;
@@ -89,8 +89,7 @@ namespace gloria::vk {
 		return mPhysicalDevice;
 	}
 
-	GpuInfo& PhysicalDevice::getGpuInfo()
-	{
+	GpuInfo& PhysicalDevice::getGpuInfo() {
 		return mGpuInfo;
 	}
 

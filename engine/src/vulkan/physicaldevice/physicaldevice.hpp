@@ -26,6 +26,7 @@ namespace gloria::vk {
 		uint8_t* pipelineCacheUUID;
 		VkPhysicalDeviceLimits limits;
 		VkPhysicalDeviceSparseProperties sparseProperties;
+		int score;
 	};
 
 	class PhysicalDevice {

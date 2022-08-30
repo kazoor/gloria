@@ -64,7 +64,7 @@ namespace gloria::vk {
 
 #ifdef DEBUG
 		auto& gpuInfo = mPhysicalDevice.get()->getGpuInfo();
-		GL_CORE_INFO("GPU selected: {0}(Driver version: {1}, API Version: {2})", gpuInfo.deviceName, gpuInfo.driverVersion, gpuInfo.apiVersion);
+		GL_CORE_INFO("GPU selected: {0}(Driver version: {1}, API Version: {2}), Score during device selection: {3}", gpuInfo.deviceName, gpuInfo.driverVersion, gpuInfo.apiVersion, gpuInfo.score);
 #endif // DEBUG
 	}
 
