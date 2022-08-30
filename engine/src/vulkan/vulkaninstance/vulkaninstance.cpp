@@ -3,10 +3,13 @@
 #include <GLFW/glfw3.h>
 #include <memory>
 #include "../../defines.hpp"
+#include "../validationlayers/validationlayers.hpp"
+#include "../physicaldevice/physicaldevice.hpp"
 
 namespace gloria::vk {
 	VulkanInstance::VulkanInstance() {
 		mValidationLayers = std::make_shared<ValidationLayers>();
+		mPhysicalDevice = std::make_shared<PhysicalDevice>();
 	}
 
 	VulkanInstance::~VulkanInstance() {
@@ -49,11 +52,19 @@ namespace gloria::vk {
 			createInfo.pNext = nullptr;
 		}
 
-		VK_VALIDATE(vkCreateInstance(&createInfo, nullptr, &mVkInstance), "Failed to create vulkan instance");
+		VK_VALIDATE(vkCreateInstance(&createInfo, nullptr, &mVkInstance), "Failed to create Vulkan instance");
 
 #ifdef DEBUG
 		if (mVkInstance != VK_NULL_HANDLE)
 			GL_CORE_INFO("Vulkan instance created");
+#endif // DEBUG
+
+		setupDebugMessenger();
+		mPhysicalDevice.get()->SelectPhysicalDevice();
+
+#ifdef DEBUG
+		auto& gpuInfo = mPhysicalDevice.get()->getGpuInfo();
+		GL_CORE_INFO("GPU selected: {0}(Driver version: {1}, API Version: {2})", gpuInfo.deviceName, gpuInfo.driverVersion, gpuInfo.apiVersion);
 #endif // DEBUG
 	}
 
@@ -66,6 +77,10 @@ namespace gloria::vk {
 		}
 
 		vkDestroyInstance(mVkInstance, nullptr);
+	}
+
+	VkInstance& VulkanInstance::getInstance() {
+		return mVkInstance;
 	}
 
 	std::vector<const char*> VulkanInstance::getRequiredExtensions() {
@@ -96,7 +111,9 @@ namespace gloria::vk {
 	void VulkanInstance::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
 		createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-		createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+		createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+		if (bIsVerbose)
+			createInfo.messageSeverity |= VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
 		createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
 		createInfo.pfnUserCallback = mValidationLayers.get()->debugCallback;
 	}

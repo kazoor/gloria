@@ -14,6 +14,12 @@
 #define VK_VALIDATE( chck, fmt ) if( chck != VK_SUCCESS ) \
   throw std::runtime_error("Vulkan Error: " fmt )
 
+#if defined(VK_USE_VERBOSE)
+const bool bIsVerbose = true;
+#else
+const bool bIsVerbose = false;
+#endif
+
 // Logging
 #define GL_CORE_TRACE(...) ::gloria::core::Log::getCoreLogger()->trace(__VA_ARGS__)
 #define GL_CORE_INFO(...) ::gloria::core::Log::getCoreLogger()->info(__VA_ARGS__)

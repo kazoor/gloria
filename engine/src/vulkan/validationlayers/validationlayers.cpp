@@ -7,8 +7,10 @@
 namespace gloria::vk {
 	ValidationLayers::ValidationLayers() {
 	}
+
 	ValidationLayers::~ValidationLayers() {
 	}
+
 	bool ValidationLayers::checkValidationLayerSupport() {
 		std::uint32_t layerCount;
 		vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
