@@ -1,5 +1,6 @@
 #include "commandbuffers.hpp"
 #include <vulkan/vulkan.h>
+#include <cstdint>
 #include "../../defines.hpp"
 #include "../physicaldevice/physicaldevice.hpp"
 #include "../../core/instance/instance.hpp"
@@ -51,25 +52,23 @@ namespace gloria::vk {
 	}
 
 	void CommandBuffer::createCommandBuffer() {
+		mCommandBuffers.resize(core::Instance::get().getVkInstance().getSwapchain().MAX_FRAMES_IN_FLIGHT);
+
 		VkCommandBufferAllocateInfo allocInfo = {
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
 			.commandPool = core::Instance::get().getVkInstance().getCommandPool().get(),
 			.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-			.commandBufferCount = 1
+			.commandBufferCount = static_cast<std::uint32_t>(mCommandBuffers.size())
 		};
 
-		VK_VALIDATE(vkAllocateCommandBuffers(core::Instance::get().getVkInstance().getLogicalDevice().get(), &allocInfo, &mCommandBuffer), "Failed to create command buffers");
+		VK_VALIDATE(vkAllocateCommandBuffers(core::Instance::get().getVkInstance().getLogicalDevice().get(), &allocInfo, mCommandBuffers.data()), "Failed to create command buffers");
 
 #ifdef DEBUG
-		if (mCommandBuffer != VK_NULL_HANDLE)
-			GL_CORE_INFO("Created command buffer");
+		if (!mCommandBuffers.empty())
+			GL_CORE_INFO("Created command buffers");
 #endif // DEBUG
 	}
 
 	void CommandBuffer::destroy() {
-	}
-
-	VkCommandBuffer& CommandBuffer::get() {
-		return mCommandBuffer;
 	}
 }

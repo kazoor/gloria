@@ -1,5 +1,6 @@
 #pragma once
 #include <vulkan/vulkan.h>
+#include <vector>
 
 namespace gloria::vk {
 	class CommandPool {
@@ -32,9 +33,6 @@ namespace gloria::vk {
 
 		void destroy();
 
-		VkCommandBuffer& get();
-
-	private:
-		VkCommandBuffer mCommandBuffer;
+		std::vector<VkCommandBuffer> mCommandBuffers;
 	};
 }

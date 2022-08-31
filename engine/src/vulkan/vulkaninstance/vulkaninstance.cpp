@@ -101,9 +101,11 @@ namespace gloria::vk {
 	}
 
 	void VulkanInstance::destroy() {
-		vkDestroySemaphore(mLogicalDevice.get()->get(), mSwapchain.get()->imageAvailableSemaphore, nullptr);
-		vkDestroySemaphore(mLogicalDevice.get()->get(), mSwapchain.get()->renderFinishedSemaphore, nullptr);
-		vkDestroyFence(mLogicalDevice.get()->get(), mSwapchain.get()->inFlightFence, nullptr);
+		for (std::size_t i = 0; i < mSwapchain.get()->MAX_FRAMES_IN_FLIGHT; i++) {
+			vkDestroySemaphore(mLogicalDevice.get()->get(), mSwapchain.get()->imageAvailableSemaphores[i], nullptr);
+			vkDestroySemaphore(mLogicalDevice.get()->get(), mSwapchain.get()->renderFinishedSemaphores[i], nullptr);
+			vkDestroyFence(mLogicalDevice.get()->get(), mSwapchain.get()->inFlightFences[i], nullptr);
+		}
 
 		mCommandPool.get()->destroy();
 

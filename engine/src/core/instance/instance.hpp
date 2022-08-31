@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <cstdint>
 #include "../../utils/base.hpp"
 #include "../../defines.hpp"
 #include "../window/window.hpp"
@@ -42,6 +43,8 @@ namespace gloria::core {
         vk::VulkanRenderer& getRenderer() {
             return *mVulkanRenderer;
         }
+
+        std::uint32_t currentFrame = 0;
 
     private:
         Shared<Window> mWindow{ nullptr };

@@ -124,6 +124,10 @@ namespace gloria::vk {
 	}
 
 	void SwapChain::createSyncObjects(VkDevice device) {
+		imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+		renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+		inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
+
 		VkSemaphoreCreateInfo semaphoreInfo = {
 	.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO
 		};
@@ -133,9 +137,11 @@ namespace gloria::vk {
 			.flags = VK_FENCE_CREATE_SIGNALED_BIT
 		};
 
-		VK_VALIDATE(vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphore) ||
-			vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphore) ||
-			vkCreateFence(device, &fenceInfo, nullptr, &inFlightFence), "Failed to create semaphores");
+		for (std::size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+			VK_VALIDATE(vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) ||
+				vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) ||
+				vkCreateFence(device, &fenceInfo, nullptr, &inFlightFences[i]), "Failed to create semaphores");
+		}
 	}
 
 	// check for our wanted surface format, if it cant be found we just return the best one.

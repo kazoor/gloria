@@ -30,11 +30,13 @@ namespace gloria::vk {
 
 		std::vector<VkImageView> swapChainImageViews;
 
-		VkSemaphore imageAvailableSemaphore;
+		std::vector<VkSemaphore> imageAvailableSemaphores;
 
-		VkSemaphore renderFinishedSemaphore;
+		std::vector<VkSemaphore> renderFinishedSemaphores;
 
-		VkFence inFlightFence;
+		std::vector<VkFence> inFlightFences;
+
+		const int MAX_FRAMES_IN_FLIGHT = 2;
 
 	private:
 		// check for our wanted surface format, if it cant be found we just return the best one.

@@ -10,24 +10,17 @@ namespace gloria::vk {
 	}
 
 	void VulkanRenderer::draw() {
-		auto& inFlightFence = core::Instance::get().getVkInstance().getSwapchain().inFlightFence;
-		auto& imageAvailableSemaphore = core::Instance::get().getVkInstance().getSwapchain().imageAvailableSemaphore;
-		auto& renderFinishedSemaphore = core::Instance::get().getVkInstance().getSwapchain().renderFinishedSemaphore;
-
-
-		vkWaitForFences(core::Instance::get().getVkInstance().getLogicalDevice().get(), 1, &core::Instance::get().getVkInstance().getSwapchain().inFlightFence, VK_TRUE, UINT64_MAX);
-		vkResetFences(core::Instance::get().getVkInstance().getLogicalDevice().get(), 1, &core::Instance::get().getVkInstance().getSwapchain().inFlightFence);
+		vkWaitForFences(core::Instance::get().getVkInstance().getLogicalDevice().get(), 1, &core::Instance::get().getVkInstance().getSwapchain().inFlightFences[core::Instance::get().currentFrame], VK_TRUE, UINT64_MAX);
+		vkResetFences(core::Instance::get().getVkInstance().getLogicalDevice().get(), 1, &core::Instance::get().getVkInstance().getSwapchain().inFlightFences[core::Instance::get().currentFrame]);
 
 		std::uint32_t imageIndex;
-		vkAcquireNextImageKHR(core::Instance::get().getVkInstance().getLogicalDevice().get(), core::Instance::get().getVkInstance().getSwapchain().get(), UINT64_MAX, core::Instance::get().getVkInstance().getSwapchain().imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+		vkAcquireNextImageKHR(core::Instance::get().getVkInstance().getLogicalDevice().get(), core::Instance::get().getVkInstance().getSwapchain().get(), UINT64_MAX, core::Instance::get().getVkInstance().getSwapchain().imageAvailableSemaphores[core::Instance::get().currentFrame], VK_NULL_HANDLE, &imageIndex);
 
-		auto commandBuffer = core::Instance::get().getVkInstance().getCommandBuffer().get();
+		recordCommandBuffer(core::Instance::get().getVkInstance().getCommandBuffer().mCommandBuffers[core::Instance::get().currentFrame], core::Instance::get().getVkInstance().getPipeline(), core::Instance::get().getVkInstance().getSwapchain(), imageIndex);
 
-		recordCommandBuffer(commandBuffer, core::Instance::get().getVkInstance().getPipeline(), core::Instance::get().getVkInstance().getSwapchain(), imageIndex);
-
-		VkSemaphore waitSemaphores[] = { core::Instance::get().getVkInstance().getSwapchain().imageAvailableSemaphore };
+		VkSemaphore waitSemaphores[] = { core::Instance::get().getVkInstance().getSwapchain().imageAvailableSemaphores[core::Instance::get().currentFrame] };
 		VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
-		VkSemaphore signalSemaphores[] = { core::Instance::get().getVkInstance().getSwapchain().renderFinishedSemaphore };
+		VkSemaphore signalSemaphores[] = { core::Instance::get().getVkInstance().getSwapchain().renderFinishedSemaphores[core::Instance::get().currentFrame] };
 
 		VkSubmitInfo submitInfo = {
 			.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
@@ -35,12 +28,12 @@ namespace gloria::vk {
 			.pWaitSemaphores = waitSemaphores,
 			.pWaitDstStageMask = waitStages,
 			.commandBufferCount = 1,
-			.pCommandBuffers = &commandBuffer,
+			.pCommandBuffers = &core::Instance::get().getVkInstance().getCommandBuffer().mCommandBuffers[core::Instance::get().currentFrame],
 			.signalSemaphoreCount = 1,
 			.pSignalSemaphores = signalSemaphores
 		};
 
-		VK_VALIDATE(vkQueueSubmit(core::Instance::get().getVkInstance().getLogicalDevice().getGraphicsQueue(), 1, &submitInfo, inFlightFence), "Failed to submit draw command buffer");
+		VK_VALIDATE(vkQueueSubmit(core::Instance::get().getVkInstance().getLogicalDevice().getGraphicsQueue(), 1, &submitInfo, core::Instance::get().getVkInstance().getSwapchain().inFlightFences[core::Instance::get().currentFrame]), "Failed to submit draw command buffer");
 
 		VkSwapchainKHR swapchains[] = { core::Instance::get().getVkInstance().getSwapchain().get() };
 		VkPresentInfoKHR presentInfo = {
@@ -54,6 +47,8 @@ namespace gloria::vk {
 		};
 
 		vkQueuePresentKHR(core::Instance::get().getVkInstance().getLogicalDevice().getPresentQueue(), &presentInfo);
+
+		core::Instance::get().currentFrame = (core::Instance::get().currentFrame + 1) % core::Instance::get().getVkInstance().getSwapchain().MAX_FRAMES_IN_FLIGHT;
 	}
 
 	void VulkanRenderer::recordCommandBuffer(VkCommandBuffer commandBuffer, GraphicsPipeline pipeline, SwapChain swapchain, std::uint32_t imageIndex) {
