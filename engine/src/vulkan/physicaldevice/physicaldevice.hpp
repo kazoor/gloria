@@ -6,7 +6,9 @@
 
 namespace gloria::vk {
 	const std::vector<const char*> deviceExtensions = {
-		VK_KHR_SWAPCHAIN_EXTENSION_NAME
+		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+		VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
+		VK_KHR_MAINTENANCE_1_EXTENSION_NAME
 	};
 
 	struct QueueFamilyIndices {

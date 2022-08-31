@@ -8,6 +8,7 @@
 #include "../logicaldevice/logicaldevice.hpp"
 #include "../swapchain/swapchain.hpp"
 #include "../graphicspipeline/graphicspipeline.hpp"
+#include "../commandbuffers/commandbuffers.hpp"
 
 namespace gloria::vk {
 	VulkanInstance::VulkanInstance() {
@@ -17,6 +18,8 @@ namespace gloria::vk {
 		mSurface = std::make_shared<Surface>();
 		mSwapchain = std::make_shared<SwapChain>();
 		mPipeline = std::make_shared<GraphicsPipeline>();
+		mCommandPool = std::make_shared<CommandPool>();
+		mCommandBuffer = std::make_shared<CommandBuffer>();
 	}
 
 	VulkanInstance::~VulkanInstance() {
@@ -41,6 +44,10 @@ namespace gloria::vk {
 		mSwapchain.get()->init();
 
 		mPipeline.get()->init();
+
+		mCommandPool.get()->init();
+
+		mCommandBuffer.get()->init();
 	}
 
 	void VulkanInstance::createInstance() {
@@ -92,6 +99,8 @@ namespace gloria::vk {
 	}
 
 	void VulkanInstance::destroy() {
+		mCommandPool.get()->destroy();
+
 		mPipeline.get()->destroy();
 
 		mSwapchain.get()->destroy();
@@ -128,6 +137,14 @@ namespace gloria::vk {
 
 	SwapChain& VulkanInstance::getSwapchain() {
 		return *mSwapchain;
+	}
+
+	GraphicsPipeline& VulkanInstance::getPipeline() {
+		return *mPipeline;
+	}
+
+	CommandPool& VulkanInstance::getCommandPool() {
+		return *mCommandPool;
 	}
 
 	std::vector<const char*> VulkanInstance::getRequiredExtensions() {

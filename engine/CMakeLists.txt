@@ -23,6 +23,7 @@ add_library(engine STATIC
     "${SRC}/vulkan/surface/surface.cpp"
     "${SRC}/vulkan/swapchain/swapchain.cpp"
     "${SRC}/vulkan/graphicspipeline/graphicspipeline.cpp"
+    "${SRC}/vulkan/commandbuffers/commandbuffers.cpp"
 )
 
 set_target_properties(engine
