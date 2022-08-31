@@ -46,6 +46,13 @@ namespace gloria::vk {
 		createInfo.enabledExtensionCount = static_cast<std::uint32_t>(deviceExtensions.size());
 		createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
+		VkPhysicalDeviceVulkan13Features dynamicRendering = {
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES,
+			.dynamicRendering = VK_TRUE
+		};
+
+		createInfo.pNext = &dynamicRendering;
+
 		if (core::Instance::get().getVkInstance().getValidationLayers().isEnabled()) {
 			createInfo.enabledLayerCount = static_cast<std::uint32_t>(core::Instance::get().getVkInstance().getValidationLayers().validationLayers.size());
 			createInfo.ppEnabledLayerNames = core::Instance::get().getVkInstance().getValidationLayers().validationLayers.data();

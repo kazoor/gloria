@@ -7,6 +7,7 @@
 #include "../physicaldevice/physicaldevice.hpp"
 #include "../logicaldevice/logicaldevice.hpp"
 #include "../swapchain/swapchain.hpp"
+#include "../graphicspipeline/graphicspipeline.hpp"
 
 namespace gloria::vk {
 	VulkanInstance::VulkanInstance() {
@@ -15,6 +16,7 @@ namespace gloria::vk {
 		mLogicalDevice = std::make_shared<LogicalDevice>();
 		mSurface = std::make_shared<Surface>();
 		mSwapchain = std::make_shared<SwapChain>();
+		mPipeline = std::make_shared<GraphicsPipeline>();
 	}
 
 	VulkanInstance::~VulkanInstance() {
@@ -37,6 +39,8 @@ namespace gloria::vk {
 		mLogicalDevice.get()->init();
 
 		mSwapchain.get()->init();
+
+		mPipeline.get()->init();
 	}
 
 	void VulkanInstance::createInstance() {
@@ -88,6 +92,8 @@ namespace gloria::vk {
 	}
 
 	void VulkanInstance::destroy() {
+		mPipeline.get()->destroy();
+
 		mSwapchain.get()->destroy();
 
 		mLogicalDevice.get()->init();
@@ -118,6 +124,10 @@ namespace gloria::vk {
 
 	Surface& VulkanInstance::getSurface() {
 		return *mSurface;
+	}
+
+	SwapChain& VulkanInstance::getSwapchain() {
+		return *mSwapchain;
 	}
 
 	std::vector<const char*> VulkanInstance::getRequiredExtensions() {

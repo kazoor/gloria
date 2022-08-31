@@ -7,6 +7,7 @@
 #include "../logicaldevice/logicaldevice.hpp"
 #include "../surface/surface.hpp"
 #include "../swapchain/swapchain.hpp"
+#include "../graphicspipeline/graphicspipeline.hpp"
 
 namespace gloria::vk {
 	class VulkanInstance {
@@ -33,6 +34,8 @@ namespace gloria::vk {
 
 		Surface& getSurface();
 
+		SwapChain& getSwapchain();
+
 	private:
 		std::vector<const char*> getRequiredExtensions();
 
@@ -51,6 +54,8 @@ namespace gloria::vk {
 		Shared<Surface> mSurface;
 
 		Shared<SwapChain> mSwapchain;
+
+		Shared<GraphicsPipeline> mPipeline;
 
 		VkDebugUtilsMessengerEXT mDebugMessenger;
 	};
