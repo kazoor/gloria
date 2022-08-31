@@ -467,3 +467,4 @@ FodyWeavers.xsd
 *.proj
 *.proj.filters
 *.sln
+*cpp.hint
