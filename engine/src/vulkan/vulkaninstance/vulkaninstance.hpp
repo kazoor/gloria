@@ -41,6 +41,8 @@ namespace gloria::vk {
 
 		CommandPool& getCommandPool();
 
+		CommandBuffer& getCommandBuffer();
+
 	private:
 		std::vector<const char*> getRequiredExtensions();
 

@@ -32,6 +32,8 @@ namespace gloria::vk {
 
 		void destroy();
 
+		VkCommandBuffer& get();
+
 	private:
 		VkCommandBuffer mCommandBuffer;
 	};

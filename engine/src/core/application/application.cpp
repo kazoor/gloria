@@ -44,7 +44,10 @@ namespace gloria::core {
 	void Application::run() {
 		while (Instance::get().getWindow().isRunning()) {
 			Instance::get().getWindow().update();
+			Instance::get().getRenderer().draw();
 		}
+
+		vkDeviceWaitIdle(Instance::get().getVkInstance().getLogicalDevice().get());
 	}
 
 	void Application::onEvent() {

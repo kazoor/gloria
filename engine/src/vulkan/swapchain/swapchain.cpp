@@ -123,6 +123,21 @@ namespace gloria::vk {
 		}
 	}
 
+	void SwapChain::createSyncObjects(VkDevice device) {
+		VkSemaphoreCreateInfo semaphoreInfo = {
+	.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO
+		};
+
+		VkFenceCreateInfo fenceInfo = {
+			.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
+			.flags = VK_FENCE_CREATE_SIGNALED_BIT
+		};
+
+		VK_VALIDATE(vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphore) ||
+			vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphore) ||
+			vkCreateFence(device, &fenceInfo, nullptr, &inFlightFence), "Failed to create semaphores");
+	}
+
 	// check for our wanted surface format, if it cant be found we just return the best one.
 	VkSurfaceFormatKHR SwapChain::selectSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
 		for (const auto& availableFormat : availableFormats) {

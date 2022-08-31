@@ -16,9 +16,36 @@ namespace gloria::vk {
 		createGraphicsPipeline();
 	}
 
+	std::vector<char> readFile(const std::string& filepath) {
+		std::ifstream file(filepath, std::ios::ate | std::ios::binary);
+
+		if (!file.is_open()) {
+			GL_CORE_ERROR("Failed to open file: {0}", filepath);
+			throw std::runtime_error("readFile");
+		}
+
+		try {
+			std::size_t fileSize = static_cast<std::size_t>(file.tellg());
+			std::vector<char> buffer(fileSize);
+
+			file.seekg(0);
+			file.read(buffer.data(), fileSize);
+
+			file.close();
+
+
+			return buffer;
+		}
+		catch (std::exception e) {
+
+		}
+
+		return std::vector<char>();
+	}
+
 	void GraphicsPipeline::createGraphicsPipeline() {
-		auto vertShaderCode = util::FileReader::readFile("resources/shaders/base.vert.spv");
-		auto fragShaderCode = util::FileReader::readFile("resources/shaders/base.frag.spv");
+		auto vertShaderCode = readFile("resources/shaders/base.vert.spv");
+		auto fragShaderCode = readFile("resources/shaders/base.frag.spv");
 
 		VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
 		VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
@@ -186,6 +213,10 @@ namespace gloria::vk {
 	void GraphicsPipeline::destroy() {
 		vkDestroyPipeline(core::Instance::get().getVkInstance().getLogicalDevice().get(), mPipeline, nullptr);
 		vkDestroyPipelineLayout(core::Instance::get().getVkInstance().getLogicalDevice().get(), mPipelineLayout, nullptr);
+	}
+
+	VkPipeline& GraphicsPipeline::get() {
+		return mPipeline;
 	}
 
 	VkShaderModule GraphicsPipeline::createShaderModule(const std::vector<char>& code) {

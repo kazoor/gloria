@@ -15,6 +15,8 @@ namespace gloria::vk {
 
 		void destroy();
 
+		VkPipeline& get();
+
 	private:
 		VkShaderModule createShaderModule(const std::vector<char>& code);
 

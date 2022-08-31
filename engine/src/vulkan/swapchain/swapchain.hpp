@@ -19,6 +19,8 @@ namespace gloria::vk {
 
 		void createImageViews();
 
+		void createSyncObjects(VkDevice device);
+
 	public:
 		std::vector<VkImage> swapChainImages;
 
@@ -27,6 +29,13 @@ namespace gloria::vk {
 		VkExtent2D swapChainExtent;
 
 		std::vector<VkImageView> swapChainImageViews;
+
+		VkSemaphore imageAvailableSemaphore;
+
+		VkSemaphore renderFinishedSemaphore;
+
+		VkFence inFlightFence;
+
 	private:
 		// check for our wanted surface format, if it cant be found we just return the best one.
 		VkSurfaceFormatKHR selectSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);

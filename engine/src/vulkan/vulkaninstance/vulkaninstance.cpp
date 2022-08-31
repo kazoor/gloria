@@ -48,6 +48,8 @@ namespace gloria::vk {
 		mCommandPool.get()->init();
 
 		mCommandBuffer.get()->init();
+
+		mSwapchain.get()->createSyncObjects(mLogicalDevice.get()->get());
 	}
 
 	void VulkanInstance::createInstance() {
@@ -99,6 +101,10 @@ namespace gloria::vk {
 	}
 
 	void VulkanInstance::destroy() {
+		vkDestroySemaphore(mLogicalDevice.get()->get(), mSwapchain.get()->imageAvailableSemaphore, nullptr);
+		vkDestroySemaphore(mLogicalDevice.get()->get(), mSwapchain.get()->renderFinishedSemaphore, nullptr);
+		vkDestroyFence(mLogicalDevice.get()->get(), mSwapchain.get()->inFlightFence, nullptr);
+
 		mCommandPool.get()->destroy();
 
 		mPipeline.get()->destroy();
@@ -145,6 +151,10 @@ namespace gloria::vk {
 
 	CommandPool& VulkanInstance::getCommandPool() {
 		return *mCommandPool;
+	}
+
+	CommandBuffer& VulkanInstance::getCommandBuffer() {
+		return *mCommandBuffer;
 	}
 
 	std::vector<const char*> VulkanInstance::getRequiredExtensions() {

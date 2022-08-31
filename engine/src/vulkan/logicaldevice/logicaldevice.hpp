@@ -18,6 +18,8 @@ namespace gloria::vk {
 
 		VkQueue& getGraphicsQueue();
 
+		VkQueue& getPresentQueue();
+
 	private:
 		VkDevice mDevice;
 

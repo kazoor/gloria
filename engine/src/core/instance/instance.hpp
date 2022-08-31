@@ -6,6 +6,7 @@
 #include "../../utils/input/input.hpp"
 #include "../../utils/input/inputhandler/inputhandler.hpp"
 #include "../../vulkan/vulkaninstance/vulkaninstance.hpp"
+#include "../../vulkan/vulkanrenderer/vulkanrenderer.hpp"
 
 namespace gloria::core {
     class Instance;
@@ -19,6 +20,7 @@ namespace gloria::core {
             mWindow = std::make_shared<Window>();
             gInputInstance = std::make_shared<util::InputHandler>();
             mVulkanInstance = std::make_shared<vk::VulkanInstance>();
+            mVulkanRenderer = std::make_shared<vk::VulkanRenderer>();
         }
 
         ~Instance() {
@@ -37,9 +39,14 @@ namespace gloria::core {
             return *mVulkanInstance;
         }
 
+        vk::VulkanRenderer& getRenderer() {
+            return *mVulkanRenderer;
+        }
+
     private:
         Shared<Window> mWindow{ nullptr };
         Shared<vk::VulkanInstance> mVulkanInstance{ nullptr };
+        Shared<vk::VulkanRenderer> mVulkanRenderer{ nullptr };
     };
 }
 

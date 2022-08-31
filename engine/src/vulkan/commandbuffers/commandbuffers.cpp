@@ -68,4 +68,8 @@ namespace gloria::vk {
 
 	void CommandBuffer::destroy() {
 	}
+
+	VkCommandBuffer& CommandBuffer::get() {
+		return mCommandBuffer;
+	}
 }

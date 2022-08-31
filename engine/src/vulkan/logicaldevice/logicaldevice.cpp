@@ -84,4 +84,8 @@ namespace gloria::vk {
 	VkQueue& LogicalDevice::getGraphicsQueue() {
 		return mGraphicsQueue;
 	}
+
+	VkQueue& LogicalDevice::getPresentQueue() {
+		return mPresentQueue;
+	}
 }
