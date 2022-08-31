@@ -20,15 +20,23 @@ namespace gloria::util {
 				throw std::runtime_error("readFile");
 			}
 
-			std::size_t fileSize = static_cast<std::size_t>(file.tellg());
-			std::vector<char> buffer(fileSize);
+			try {
+				std::size_t fileSize = static_cast<std::size_t>(file.tellg());
+				std::vector<char> buffer(fileSize);
 
-			file.seekg(0);
-			file.read(buffer.data(), fileSize);
+				file.seekg(0);
+				file.read(buffer.data(), fileSize);
 
-			file.close();
+				file.close();
 
-			return buffer;
+
+				return buffer;
+			}
+			catch (std::exception e) {
+				GL_CORE_ERROR("{}", e.what());
+			}
+
+			return std::vector<char>();
 		}
 	};
 }
