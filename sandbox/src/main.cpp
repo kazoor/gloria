@@ -32,6 +32,7 @@ public:
 	App() {
 		gloria::Shared<SandboxLayer> layer = std::make_shared<SandboxLayer>();
 		pushLayer(layer);
+		setWindowTitle("Sandbox");
 	}
 };
 

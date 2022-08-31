@@ -70,4 +70,8 @@ namespace gloria::core {
 	Window& Application::getWindow() {
 		return Instance::get().getWindow();
 	}
+
+	void Application::setWindowTitle(const std::string& title) {
+		Instance::get().getWindow().setTitle(title);
+	}
 }

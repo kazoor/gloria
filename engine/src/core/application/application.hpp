@@ -27,5 +27,7 @@ namespace gloria::core {
 		// virtual void applyLayers(void* ctx) = 0;
 
 		Window& getWindow();
+
+		void setWindowTitle(const std::string &title);
 	};
 }
