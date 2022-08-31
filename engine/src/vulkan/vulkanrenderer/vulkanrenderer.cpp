@@ -1,6 +1,7 @@
 #include "vulkanrenderer.hpp"
 #include "../../core/instance/instance.hpp"
 #include "../../defines.hpp"
+#include "../../core/events/eventhandler/eventhandler.hpp"
 
 namespace gloria::vk {
 	VulkanRenderer::VulkanRenderer() {
@@ -11,10 +12,20 @@ namespace gloria::vk {
 
 	void VulkanRenderer::draw() {
 		vkWaitForFences(core::Instance::get().getVkInstance().getLogicalDevice().get(), 1, &core::Instance::get().getVkInstance().getSwapchain().inFlightFences[core::Instance::get().currentFrame], VK_TRUE, UINT64_MAX);
-		vkResetFences(core::Instance::get().getVkInstance().getLogicalDevice().get(), 1, &core::Instance::get().getVkInstance().getSwapchain().inFlightFences[core::Instance::get().currentFrame]);
 
 		std::uint32_t imageIndex;
-		vkAcquireNextImageKHR(core::Instance::get().getVkInstance().getLogicalDevice().get(), core::Instance::get().getVkInstance().getSwapchain().get(), UINT64_MAX, core::Instance::get().getVkInstance().getSwapchain().imageAvailableSemaphores[core::Instance::get().currentFrame], VK_NULL_HANDLE, &imageIndex);
+		VkResult result = vkAcquireNextImageKHR(core::Instance::get().getVkInstance().getLogicalDevice().get(), core::Instance::get().getVkInstance().getSwapchain().get(), UINT64_MAX, core::Instance::get().getVkInstance().getSwapchain().imageAvailableSemaphores[core::Instance::get().currentFrame], VK_NULL_HANDLE, &imageIndex);
+
+		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+			core::Instance::get().getVkInstance().getSwapchain().recreateSwapchain();
+			return;
+		}
+		else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+			throw std::runtime_error("failed to acquire swap chain image!");
+		}
+
+		// only reset if we have something to submit
+		vkResetFences(core::Instance::get().getVkInstance().getLogicalDevice().get(), 1, &core::Instance::get().getVkInstance().getSwapchain().inFlightFences[core::Instance::get().currentFrame]);
 
 		recordCommandBuffer(core::Instance::get().getVkInstance().getCommandBuffer().mCommandBuffers[core::Instance::get().currentFrame], core::Instance::get().getVkInstance().getPipeline(), core::Instance::get().getVkInstance().getSwapchain(), imageIndex);
 
@@ -46,7 +57,15 @@ namespace gloria::vk {
 			.pResults = nullptr
 		};
 
-		vkQueuePresentKHR(core::Instance::get().getVkInstance().getLogicalDevice().getPresentQueue(), &presentInfo);
+		result = vkQueuePresentKHR(core::Instance::get().getVkInstance().getLogicalDevice().getPresentQueue(), &presentInfo);
+
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || core::Instance::get().framebufferResized) {
+			core::Instance::get().framebufferResized = false;
+			core::Instance::get().getVkInstance().getSwapchain().recreateSwapchain();
+		}
+		else if (result != VK_SUCCESS) {
+			throw std::runtime_error("failed to present swap chain image!");
+		}
 
 		core::Instance::get().currentFrame = (core::Instance::get().currentFrame + 1) % core::Instance::get().getVkInstance().getSwapchain().MAX_FRAMES_IN_FLIGHT;
 	}

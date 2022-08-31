@@ -44,8 +44,9 @@ namespace gloria::core {
             return *mVulkanRenderer;
         }
 
-        std::uint32_t currentFrame = 0;
+        std::uint32_t currentFrame{ 0 };
 
+        bool framebufferResized{ false };
     private:
         Shared<Window> mWindow{ nullptr };
         Shared<vk::VulkanInstance> mVulkanInstance{ nullptr };

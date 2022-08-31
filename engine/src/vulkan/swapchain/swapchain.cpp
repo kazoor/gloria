@@ -1,5 +1,7 @@
 #include "swapchain.hpp"
 #include <vulkan/vulkan.h>
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
 #include <cstdint>
 #include <limits>
 #include <algorithm>
@@ -142,6 +144,22 @@ namespace gloria::vk {
 				vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) ||
 				vkCreateFence(device, &fenceInfo, nullptr, &inFlightFences[i]), "Failed to create semaphores");
 		}
+	}
+
+	void SwapChain::recreateSwapchain() {
+		int width = 0, height = 0;
+		glfwGetFramebufferSize(core::Instance::get().getWindow().getRawWindow(), &width, &height);
+		while (width == 0 || height == 0) {
+			glfwGetFramebufferSize(core::Instance::get().getWindow().getRawWindow(), &width, &height);
+			glfwWaitEvents();
+		}
+
+		vkDeviceWaitIdle(core::Instance::get().getVkInstance().getLogicalDevice().get());
+
+		destroy();
+
+		createSwapChain();
+		createImageViews();
 	}
 
 	// check for our wanted surface format, if it cant be found we just return the best one.

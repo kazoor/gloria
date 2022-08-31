@@ -101,6 +101,10 @@ namespace gloria::vk {
 	}
 
 	void VulkanInstance::destroy() {
+		mSwapchain.get()->destroy();
+
+		mPipeline.get()->destroy();
+
 		for (std::size_t i = 0; i < mSwapchain.get()->MAX_FRAMES_IN_FLIGHT; i++) {
 			vkDestroySemaphore(mLogicalDevice.get()->get(), mSwapchain.get()->imageAvailableSemaphores[i], nullptr);
 			vkDestroySemaphore(mLogicalDevice.get()->get(), mSwapchain.get()->renderFinishedSemaphores[i], nullptr);
@@ -109,10 +113,6 @@ namespace gloria::vk {
 
 		mCommandPool.get()->destroy();
 
-		mPipeline.get()->destroy();
-
-		mSwapchain.get()->destroy();
-
 		mLogicalDevice.get()->init();
 
 		if (mValidationLayers.get()->isEnabled()) {
@@ -120,6 +120,7 @@ namespace gloria::vk {
 		}
 
 		mSurface.get()->destroy();
+
 		vkDestroyInstance(mVkInstance, nullptr);
 	}
 

@@ -60,6 +60,11 @@ namespace gloria::core {
 			auto event = static_cast<const WindowFocusEvent&>(e);
 			GL_CORE_INFO("Focus event triggered! focus: {0}", event.focus);
 			});
+
+		EventHandler::on<WindowFrameBufferResizeEvent>([&](const core::Event& e) {
+			auto event = static_cast<const WindowFrameBufferResizeEvent&>(e);
+			Instance::get().framebufferResized = true;
+		});
 	}
 
 	Window& Application::getWindow() {

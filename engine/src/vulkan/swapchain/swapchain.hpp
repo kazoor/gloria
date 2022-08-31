@@ -21,6 +21,8 @@ namespace gloria::vk {
 
 		void createSyncObjects(VkDevice device);
 
+		void recreateSwapchain();
+
 	public:
 		std::vector<VkImage> swapChainImages;
 
